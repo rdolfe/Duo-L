@@ -23,17 +23,20 @@ Ouvre http://localhost:5173 dans **Chrome ou Edge** (la reconnaissance vocale We
 
 - 4 types d'exercices **oraux** : Écoute & répète, Traduis & parle, Dialogue (roleplay), Lecture à voix haute (score par mot).
 - 4 types d'exercices **écrits** : QCM (bonnes et mauvaises réponses), Phrase à trou, Traduction écrite, Dictée (score par mot).
-- Bouton « 💡 Je ne sais pas — voir la réponse » sur chaque exercice (coûte 1 cœur).
-- Scoring : alignement mot à mot (Needleman-Wunsch) + distance de Levenshtein, calculé côté serveur ; comparaison exacte pour les QCM.
+- **Validation manuelle** : le joueur choisit/enregistre sa réponse puis clique « Valider » — rien n'est comptabilisé avant. Le micro se contrôle au clic (démarrer / arrêter), avec relecture avant de valider.
+- **Bonne réponse affichée** dès que le score n'atteint pas 100 %, sur chaque exercice comme dans les tests.
+- **Tests de fin de niveau notés sur 20** : à la fin de chaque niveau, un examen (toutes catégories mélangées) qu'il faut réussir (≥ 12/20) pour débloquer le niveau CECRL suivant.
+- Bouton « 💡 Je ne sais pas — voir la réponse » sur chaque exercice de leçon (coûte 1 cœur ; les tests ne coûtent pas de cœurs).
+- Scoring : alignement mot à mot (Needleman-Wunsch) + distance de Levenshtein, calculé côté serveur ; comparaison exacte pour les QCM. Les nombres sont normalisés : « 1 » et « one », « 21 » et « twenty-one » sont équivalents.
 - Gamification : XP (journal `XpEvent`), séries quotidiennes, 5 vies (régénération : 1 cœur / 2 h), 9 badges.
-- Parcours A1 → C2 : 15 unités, 29 leçons, ~115 exercices, déblocage séquentiel.
+- Parcours A1 → C2 : 15 unités, 29 leçons, 6 tests de niveau, ~300 exercices. Les exercices sont regroupés par type au sein de chaque leçon ; déblocage séquentiel des leçons, puis des niveaux via les tests.
 - Interface responsive (mobile inclus) — voir [DEPLOY.md](DEPLOY.md) pour la mise en ligne.
 
 ## Structure
 
 ```
 apps/api   Fastify + Prisma (routes: auth, content, attempts) 
-apps/web   React (features: auth, dashboard, lesson, exercises)
+apps/web   React (features: auth, dashboard, lesson, exam, exercises)
 ```
 
 ## V2 envisagée

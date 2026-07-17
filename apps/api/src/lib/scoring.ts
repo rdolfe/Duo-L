@@ -1,21 +1,83 @@
 // Évaluation de prononciation : on compare la transcription STT au texte attendu.
 // Alignement mot à mot (programmation dynamique) + similarité de Levenshtein par mot.
 
-const NUMBER_WORDS: Record<string, string> = {
-  "0": "zero", "1": "one", "2": "two", "3": "three", "4": "four", "5": "five",
-  "6": "six", "7": "seven", "8": "eight", "9": "nine", "10": "ten",
-  "11": "eleven", "12": "twelve", "13": "thirteen", "14": "fourteen", "15": "fifteen",
-  "16": "sixteen", "17": "seventeen", "18": "eighteen", "19": "nineteen", "20": "twenty",
+// Nombres en toutes lettres → valeur. On canonicalise tout nombre (chiffres ou
+// mots) vers sa forme chiffrée, pour que « 1 », « one », « twenty-one » et « 21 »
+// soient traités comme identiques lors de la comparaison.
+const UNITS_MAP: Record<string, number> = {
+  zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7,
+  eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, thirteen: 13,
+  fourteen: 14, fifteen: 15, sixteen: 16, seventeen: 17, eighteen: 18, nineteen: 19,
 };
+const TENS_MAP: Record<string, number> = {
+  twenty: 20, thirty: 30, forty: 40, fifty: 50, sixty: 60, seventy: 70, eighty: 80, ninety: 90,
+};
+const SCALES_MAP: Record<string, number> = { hundred: 100, thousand: 1000, million: 1000000 };
+const NUMBER_WORDS = new Set([
+  ...Object.keys(UNITS_MAP),
+  ...Object.keys(TENS_MAP),
+  ...Object.keys(SCALES_MAP),
+]);
+
+// Convertit une suite de mots-nombres (« one hundred and one ») en valeur.
+function parseNumberRun(run: string[]): number {
+  let total = 0;
+  let current = 0;
+  for (const t of run) {
+    if (t in UNITS_MAP) current += UNITS_MAP[t];
+    else if (t in TENS_MAP) current += TENS_MAP[t];
+    else if (t === "hundred") current = (current || 1) * 100;
+    else if (t === "thousand") { total += (current || 1) * 1000; current = 0; }
+    else if (t === "million") { total += (current || 1) * 1000000; current = 0; }
+  }
+  return total + current;
+}
+
+// Fusionne les suites de mots-nombres en un unique jeton chiffré ; laisse les
+// chiffres tels quels et les autres mots inchangés.
+function canonicalizeNumbers(tokens: string[]): string[] {
+  const out: string[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const t = tokens[i];
+    if (NUMBER_WORDS.has(t)) {
+      const run: string[] = [];
+      let j = i;
+      while (j < tokens.length) {
+        if (NUMBER_WORDS.has(tokens[j])) {
+          run.push(tokens[j]);
+          j++;
+        } else if (
+          // « and » n'est un connecteur que juste après une échelle : « hundred and one »
+          tokens[j] === "and" &&
+          run.length > 0 &&
+          run[run.length - 1] in SCALES_MAP &&
+          j + 1 < tokens.length &&
+          NUMBER_WORDS.has(tokens[j + 1])
+        ) {
+          j++;
+        } else {
+          break;
+        }
+      }
+      out.push(String(parseNumberRun(run)));
+      i = j;
+    } else {
+      out.push(t);
+      i++;
+    }
+  }
+  return out;
+}
 
 export function normalizeWords(s: string): string[] {
-  return s
+  const tokens = s
     .toLowerCase()
     .replace(/[’]/g, "'")
     .replace(/[^a-z0-9' ]+/g, " ")
     .split(/\s+/)
-    .filter(Boolean)
-    .map((w) => NUMBER_WORDS[w] ?? w);
+    .filter(Boolean);
+  return canonicalizeNumbers(tokens);
 }
 
 function levenshtein(a: string, b: string): number {

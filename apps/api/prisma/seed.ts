@@ -15,6 +15,7 @@ type Ex =
 
 type LessonDef = { title: string; xp?: number; exercises: Ex[] };
 type UnitDef = { cefrLevel: string; title: string; description: string; lessons: LessonDef[] };
+type ExamDef = { cefrLevel: string; title: string; description: string; passScore?: number; xp?: number; exercises: Ex[] };
 
 const LR = (textEn: string, hintFr?: string): Ex => ({ type: "LISTEN_REPEAT", textEn, hintFr });
 const TS = (textFr: string, ...accepted: string[]): Ex => ({ type: "TRANSLATE_SPEAK", textFr, accepted });
@@ -31,6 +32,26 @@ const FB = (sentence: string, answer: string, hintFr?: string, ...alternatives: 
 const WT = (textFr: string, ...accepted: string[]): Ex => ({ type: "WRITE_TRANSLATION", textFr, accepted });
 const LT = (textEn: string): Ex => ({ type: "LISTEN_TYPE", textEn });
 
+// Ordre pédagogique : on regroupe les exercices par type à l'intérieur de chaque
+// leçon (d'abord l'oral, puis l'écrit), pour que le joueur enchaîne les mêmes
+// gestes ensemble (répéter, parler, dialoguer, lire, QCM, mot manquant, traduire,
+// dictée).
+const TYPE_ORDER: Record<Ex["type"], number> = {
+  LISTEN_REPEAT: 1,
+  TRANSLATE_SPEAK: 2,
+  ROLEPLAY: 3,
+  READ_ALOUD: 4,
+  MULTIPLE_CHOICE: 5,
+  FILL_BLANK: 6,
+  WRITE_TRANSLATION: 7,
+  LISTEN_TYPE: 8,
+};
+const byType = (exercises: Ex[]): Ex[] =>
+  exercises
+    .map((ex, i) => ({ ex, i }))
+    .sort((a, b) => TYPE_ORDER[a.ex.type] - TYPE_ORDER[b.ex.type] || a.i - b.i)
+    .map(({ ex }) => ex);
+
 const UNITS: UnitDef[] = [
   // ==================== A1 ====================
   {
@@ -43,19 +64,29 @@ const UNITS: UnitDef[] = [
         exercises: [
           LR("Hello!", "Bonjour !"),
           LR("Good morning.", "Bonjour (le matin)."),
+          LR("Good afternoon.", "Bonjour (l'après-midi)."),
           TS("Bonsoir.", "good evening"),
+          TS("Salut, ça va ?", "hi how are you", "hey how are you"),
+          MC("Comment dit-on « Bonne nuit » ?", ["Good night", "Good morning", "Good evening", "Good day"], "Good night"),
+          FB("___ morning, everyone!", "good", "le matin"),
           RP("Vous croisez un voisin dans la rue.", "Tom", "Hi! How are you?",
             "I am fine, thank you.", "Not bad, and you?"),
+          LT("Good evening."),
         ],
       },
       {
         title: "Se présenter",
         exercises: [
           LR("My name is Anna.", "Je m'appelle Anna."),
-          TS("Je m'appelle Paul.", "my name is paul", "i am paul", "i'm paul"),
           LR("Nice to meet you.", "Enchanté."),
+          TS("Je m'appelle Paul.", "my name is paul", "i am paul", "i'm paul"),
+          TS("D'où viens-tu ?", "where are you from"),
+          MC("« I am from France » signifie :", ["Je viens de France", "Je vais en France", "J'aime la France", "Je suis en France"], "Je viens de France"),
+          FB("What is your ___?", "name", "prénom/nom"),
+          WT("Je suis étudiant.", "i am a student", "i'm a student"),
           RP("Vous rencontrez une collègue pour la première fois.", "Sarah", "Hello, I'm Sarah. What's your name?",
             "My name is Alex, nice to meet you.", "I am Alex, how are you?"),
+          LT("My name is John."),
         ],
       },
       {
@@ -63,8 +94,13 @@ const UNITS: UnitDef[] = [
         exercises: [
           LR("Please.", "S'il vous plaît."),
           LR("Thank you very much.", "Merci beaucoup."),
+          LR("You're welcome.", "De rien."),
           TS("Excusez-moi.", "excuse me", "sorry"),
+          MC("On répond à « Thank you » par :", ["You're welcome", "Please", "Sorry", "Goodbye"], "You're welcome"),
+          FB("___ you very much!", "thank", "remercier"),
+          WT("Je suis désolé.", "i am sorry", "i'm sorry"),
           RA("Hello! Thank you very much for your help. You are very kind. Have a nice day!"),
+          LT("You are very kind."),
         ],
       },
     ],
@@ -78,29 +114,44 @@ const UNITS: UnitDef[] = [
         title: "Au café",
         exercises: [
           LR("I would like a coffee, please.", "Je voudrais un café, s'il vous plaît."),
+          LR("How much is it?", "Combien ça coûte ?"),
           TS("Un thé, s'il vous plaît.", "a tea please", "one tea please", "a cup of tea please"),
+          TS("L'addition, s'il vous plaît.", "the bill please", "the check please", "can i have the bill please"),
+          MC("Pour commander, on dit :", ["I would like", "I am like", "I would love it", "I want it now"], "I would like"),
+          FB("A coffee, ___ please.", "yes", "réponse polie", "sure"),
+          WT("Je voudrais de l'eau.", "i would like some water", "i would like water", "can i have some water"),
           RP("Le serveur prend votre commande.", "Waiter", "Good morning! What can I get you?",
             "I would like a coffee, please.", "A tea and a croissant, please."),
-          LR("How much is it?", "Combien ça coûte ?"),
+          LT("How much is the coffee?"),
         ],
       },
       {
         title: "Les nombres",
         exercises: [
           LR("One, two, three, four, five.", "Un, deux, trois, quatre, cinq."),
-          TS("J'ai deux frères.", "i have two brothers"),
           LR("It costs ten dollars.", "Ça coûte dix dollars."),
+          TS("J'ai deux frères.", "i have two brothers"),
+          TS("Il y a trois pommes.", "there are three apples"),
+          MC("Combien font « two plus three » ?", ["five", "four", "six", "seven"], "five"),
+          FB("I am ___ years old. (7)", "seven", "écris le nombre en lettres ou en chiffres", "7"),
+          WT("J'ai quinze ans.", "i am fifteen", "i am fifteen years old", "i'm fifteen"),
           RA("I have three cats and two dogs. My sister has one bird. We have six animals at home."),
+          LT("There are twelve months in a year."),
         ],
       },
       {
         title: "La famille",
         exercises: [
           LR("This is my mother.", "Voici ma mère."),
-          TS("Mon père s'appelle John.", "my father's name is john", "my father is called john", "my dad's name is john"),
           LR("I have a little sister.", "J'ai une petite sœur."),
+          TS("Mon père s'appelle John.", "my father's name is john", "my father is called john", "my dad's name is john"),
+          TS("As-tu des frères et sœurs ?", "do you have any brothers or sisters", "do you have brothers or sisters"),
+          MC("« brother » signifie :", ["frère", "sœur", "père", "cousin"], "frère"),
+          FB("My ___ is my mother's mother.", "grandmother", "la mère de ma mère", "grandma"),
+          WT("Voici ma famille.", "this is my family", "here is my family"),
           RP("Un ami regarde une photo de famille.", "Emma", "Who is this on the photo?",
             "This is my mother and my father.", "This is my little sister."),
+          LT("This is my brother and my sister."),
         ],
       },
     ],
@@ -114,20 +165,31 @@ const UNITS: UnitDef[] = [
         title: "Demander son chemin",
         exercises: [
           LR("Where is the train station?", "Où est la gare ?"),
+          LR("Go straight ahead.", "Allez tout droit."),
           TS("Où est la gare ?", "where is the train station", "where is the station"),
           TS("Où sont les toilettes ?", "where are the toilets", "where is the bathroom", "where is the restroom"),
+          MC("« turn left » signifie :", ["tourner à gauche", "tourner à droite", "tout droit", "faire demi-tour"], "tourner à gauche"),
+          FB("Where ___ the museum?", "is", "verbe être au singulier"),
+          WT("C'est près d'ici ?", "is it near here", "is it close to here", "is it near"),
           RP("Vous êtes perdu dans la rue.", "Passerby", "You look lost. Can I help you?",
             "Yes, where is the train station?", "Yes, I am looking for the museum."),
+          LT("Turn right at the corner."),
         ],
       },
       {
         title: "À la gare",
         exercises: [
           LR("A ticket to London, please.", "Un billet pour Londres, s'il vous plaît."),
+          LR("Which platform is it?", "C'est quel quai ?"),
           TS("Le train part à quelle heure ?", "what time does the train leave", "when does the train leave"),
+          TS("Un aller-retour, s'il vous plaît.", "a return ticket please", "a round trip please", "a round trip ticket please"),
+          MC("« platform » signifie :", ["le quai", "le billet", "le train", "la sortie"], "le quai"),
+          FB("A ticket ___ London, please.", "to", "direction"),
+          WT("Le train est en retard.", "the train is late", "the train is delayed"),
           RP("Au guichet de la gare.", "Agent", "Good morning, where would you like to go?",
             "A ticket to London, please.", "I would like to go to Paris."),
           RA("The train to London leaves at nine. It arrives at eleven. The ticket costs twenty pounds."),
+          LT("The next train leaves at ten."),
         ],
       },
     ],
@@ -142,20 +204,31 @@ const UNITS: UnitDef[] = [
         title: "À l'hôtel",
         exercises: [
           LR("I have a reservation for two nights.", "J'ai une réservation pour deux nuits."),
+          LR("What time is breakfast served?", "À quelle heure le petit-déjeuner est-il servi ?"),
           TS("Je voudrais une chambre avec vue.", "i would like a room with a view", "i want a room with a view"),
+          TS("Y a-t-il le wifi gratuit ?", "is there free wifi", "do you have free wifi"),
+          MC("« a double room » est :", ["une chambre double", "une chambre simple", "une suite", "un dortoir"], "une chambre double"),
+          FB("I have a ___ for two nights.", "reservation", "réservation", "booking"),
+          WT("À quelle heure est le départ ?", "what time is check out", "what time is checkout", "when is check out"),
           RP("À la réception de l'hôtel.", "Receptionist", "Welcome! Do you have a reservation?",
             "Yes, I have a reservation for two nights.", "No, do you have a room available?"),
-          LR("What time is breakfast served?", "À quelle heure le petit-déjeuner est-il servi ?"),
+          LT("Breakfast is served at eight."),
         ],
       },
       {
         title: "À l'aéroport",
         exercises: [
           LR("My flight is delayed.", "Mon vol est retardé."),
+          LR("Where is the boarding gate?", "Où est la porte d'embarquement ?"),
           TS("Où est la porte d'embarquement ?", "where is the boarding gate", "where is the gate"),
+          TS("J'ai un bagage à enregistrer.", "i have a bag to check in", "i have one bag to check in", "i have a suitcase to check in"),
+          MC("« boarding pass » signifie :", ["carte d'embarquement", "passeport", "billet de train", "valise"], "carte d'embarquement"),
+          FB("My flight is ___, I have to wait.", "delayed", "retardé", "late"),
+          WT("Mon vol part à sept heures.", "my flight leaves at seven", "my flight is at seven", "my flight departs at seven"),
           RP("Au comptoir d'enregistrement.", "Agent", "Can I see your passport, please?",
             "Of course, here it is.", "Yes, one moment please."),
           RA("My flight leaves at seven in the morning. I need to be at the airport two hours early. I always check my passport twice."),
+          LT("The gate closes in twenty minutes."),
         ],
       },
     ],
@@ -169,20 +242,31 @@ const UNITS: UnitDef[] = [
         title: "Au magasin",
         exercises: [
           LR("Do you have this in a smaller size?", "L'avez-vous en plus petite taille ?"),
+          LR("Can I pay by card?", "Puis-je payer par carte ?"),
           TS("Combien coûte cette veste ?", "how much is this jacket", "how much does this jacket cost"),
+          TS("Est-ce que je peux essayer ça ?", "can i try this on", "may i try this on"),
+          MC("« too expensive » signifie :", ["trop cher", "trop grand", "trop petit", "pas assez"], "trop cher"),
+          FB("Can I pay by ___?", "card", "moyen de paiement", "credit card"),
+          WT("C'est trop grand.", "it is too big", "it's too big"),
           RP("Dans une boutique de vêtements.", "Seller", "Hello, can I help you find something?",
             "Yes, I am looking for a black jacket.", "No thank you, I am just looking."),
-          LR("Can I pay by card?", "Puis-je payer par carte ?"),
+          LT("How much does it cost?"),
         ],
       },
       {
         title: "Au restaurant",
         exercises: [
           LR("A table for two, please.", "Une table pour deux, s'il vous plaît."),
+          LR("The bill, please.", "L'addition, s'il vous plaît."),
           TS("Je vais prendre le poulet.", "i will have the chicken", "i'll have the chicken", "i will take the chicken"),
+          TS("Pourrais-je avoir de l'eau ?", "could i have some water", "can i have some water", "may i have some water"),
+          MC("« starter » veut dire :", ["entrée", "plat principal", "dessert", "boisson"], "entrée"),
+          FB("A table ___ two, please.", "for", "pour"),
+          WT("C'était délicieux.", "it was delicious", "that was delicious"),
           RP("Le serveur revient à votre table.", "Waiter", "How was everything tonight?",
             "It was delicious, thank you.", "Very good, can we have the bill please?"),
           RA("Last night we went to a small Italian restaurant. I ordered pasta and my friend chose the fish. The food was delicious and not too expensive."),
+          LT("Can we have the menu, please?"),
         ],
       },
     ],
@@ -197,20 +281,31 @@ const UNITS: UnitDef[] = [
         title: "Parler de ses loisirs",
         exercises: [
           LR("In my free time, I enjoy hiking and photography.", "Pendant mon temps libre, j'aime la randonnée et la photo."),
+          LR("I usually go running on weekends.", "Je vais généralement courir le week-end."),
           TS("Je fais du sport trois fois par semaine.", "i play sports three times a week", "i do sports three times a week", "i exercise three times a week"),
+          TS("J'adore lire des romans.", "i love reading novels", "i love to read novels"),
+          MC("« I am keen on cooking » signifie :", ["J'aime beaucoup cuisiner", "Je déteste cuisiner", "Je cuisine mal", "Je ne cuisine jamais"], "J'aime beaucoup cuisiner"),
+          FB("I am really into ___ these days.", "photography", "un loisir", "cooking", "running"),
+          WT("Je joue de la guitare depuis cinq ans.", "i have been playing the guitar for five years", "i have played the guitar for five years"),
           RP("Une discussion entre amis.", "Mike", "What do you usually do on weekends?",
             "I usually go hiking with my friends.", "I like to stay home and read books."),
           RA("I have been playing the guitar for five years. At first it was difficult, but now I really enjoy it. Music helps me relax after a long day at work."),
+          LT("I enjoy hiking in the mountains."),
         ],
       },
       {
         title: "Donner son opinion",
         exercises: [
           LR("In my opinion, this movie is overrated.", "À mon avis, ce film est surestimé."),
+          LR("I see your point, but I disagree.", "Je comprends ton point de vue, mais je ne suis pas d'accord."),
           TS("Je pense que tu as raison.", "i think you are right", "i think you're right"),
+          TS("Je ne suis pas d'accord avec toi.", "i disagree with you", "i do not agree with you", "i don't agree with you"),
+          MC("« I couldn't agree more » veut dire :", ["Je suis tout à fait d'accord", "Je ne suis pas d'accord", "Je ne sais pas", "Peut-être"], "Je suis tout à fait d'accord"),
+          FB("In my ___, the book is better than the film.", "opinion", "avis", "view"),
+          WT("D'après moi, c'est une bonne idée.", "in my opinion it is a good idea", "in my opinion it's a good idea", "i think it is a good idea"),
           RP("Un débat sur les réseaux sociaux.", "Julia", "Do you think social media is good for society?",
             "In my opinion, it depends on how we use it.", "I believe it has more disadvantages than benefits."),
-          LR("I see your point, but I disagree.", "Je comprends ton point de vue, mais je ne suis pas d'accord."),
+          LT("I strongly believe we should try."),
         ],
       },
     ],
@@ -224,10 +319,16 @@ const UNITS: UnitDef[] = [
         title: "Un entretien d'embauche",
         exercises: [
           LR("I have three years of experience in marketing.", "J'ai trois ans d'expérience en marketing."),
+          LR("I work well under pressure.", "Je travaille bien sous pression."),
           TS("Pourquoi voulez-vous travailler ici ?", "why do you want to work here"),
+          TS("Je suis disponible immédiatement.", "i am available immediately", "i'm available immediately", "i am available right away"),
+          MC("« a strength » dans un entretien est :", ["une qualité", "un défaut", "un salaire", "un congé"], "une qualité"),
+          FB("I have three years of ___ in this field.", "experience", "expérience"),
+          WT("Je suis motivé et fiable.", "i am motivated and reliable", "i'm motivated and reliable"),
           RP("Face au recruteur.", "Recruiter", "Tell me about your greatest strength.",
             "I am very organized and I learn quickly.", "I work well under pressure and in a team."),
           RA("Thank you for this opportunity. I believe my experience matches this position perfectly. I am motivated, reliable, and I look forward to joining your team."),
+          LT("I am looking for a new challenge."),
         ],
       },
     ],
@@ -242,18 +343,30 @@ const UNITS: UnitDef[] = [
         title: "Exprimer un désaccord",
         exercises: [
           LR("I'm afraid I have to disagree with that statement.", "Je crains de devoir contester cette affirmation."),
+          LR("With all due respect, I see it differently.", "Avec tout le respect que je vous dois, je le vois autrement."),
           TS("Ce n'est pas aussi simple que ça en a l'air.", "it is not as simple as it seems", "it's not as simple as it looks", "it is not as simple as it looks"),
+          TS("Je comprends votre point de vue, cependant je ne suis pas d'accord.", "i see your point however i disagree", "i understand your point but i disagree"),
+          MC("« I beg to differ » signifie :", ["Je me permets de ne pas être d'accord", "Je suis d'accord", "Je m'excuse", "Je ne comprends pas"], "Je me permets de ne pas être d'accord"),
+          FB("I'm afraid I have to ___ with you on that.", "disagree", "ne pas être d'accord"),
+          WT("Je crains que ce ne soit pas exact.", "i am afraid that is not accurate", "i'm afraid that is not correct", "i am afraid that is not correct"),
           RP("Une réunion houleuse au bureau.", "Colleague", "I think we should cut the research budget entirely.",
             "I see your point, however that would hurt us in the long run.", "With all due respect, I strongly disagree with that approach."),
           RA("While I understand the appeal of this proposal, we must consider its long-term consequences. Cutting costs today could seriously undermine our competitiveness tomorrow."),
+          LT("I'm afraid I can't agree with that."),
         ],
       },
       {
         title: "Argumenter avec nuance",
         exercises: [
           LR("On the one hand it saves money, on the other hand it increases risk.", "D'un côté ça économise de l'argent, de l'autre ça augmente le risque."),
+          LR("That said, there are some clear benefits.", "Cela dit, il y a des avantages évidents."),
           TS("Tout bien considéré, je pense que cela en vaut la peine.", "all things considered i think it is worth it", "all things considered i think it's worth it"),
+          TS("D'un autre côté, cela pourrait poser problème.", "on the other hand it could be a problem", "on the other hand this could be a problem"),
+          MC("« nevertheless » veut dire :", ["néanmoins", "par exemple", "en effet", "d'abord"], "néanmoins"),
+          FB("On the one hand it is cheap; on the ___ hand it is risky.", "other", "l'autre côté"),
+          WT("Cela dit, nous devrions être prudents.", "that said we should be careful", "having said that we should be careful"),
           RA("The evidence suggests that remote work increases productivity for most employees. Nevertheless, it may weaken team cohesion over time, which is precisely why a hybrid approach deserves serious consideration."),
+          LT("On the whole, the plan seems reasonable."),
         ],
       },
     ],
@@ -268,10 +381,16 @@ const UNITS: UnitDef[] = [
         title: "L'ironie et l'humour",
         exercises: [
           LR("Well, that meeting was an absolute triumph, wasn't it?", "Eh bien, cette réunion était un triomphe absolu, n'est-ce pas ? (ironique)"),
+          LR("Oh, brilliant. Just what we needed.", "Oh, génial. C'est exactement ce qu'il nous fallait. (ironique)"),
           TS("C'est la meilleure idée que j'aie jamais entendue... ou pas.", "that is the best idea i have ever heard or not", "that's the best idea i've ever heard or not"),
+          TS("Disons que ça aurait pu mieux se passer.", "let's just say it could have gone better", "let us just say it could have gone better"),
+          MC("« That's rich, coming from you » exprime :", ["l'ironie / le reproche", "un compliment", "un remerciement", "une excuse"], "l'ironie / le reproche"),
+          FB("Let's just say it could have gone ___.", "better", "mieux"),
+          WT("Honnêtement, c'était un désastre, mais on a survécu.", "honestly it was a disaster but we survived", "honestly it was a complete disaster but we survived"),
           RP("Après une présentation catastrophique.", "Coworker", "So, how do you think the presentation went?",
             "Let's just say it could have gone better.", "Honestly, it was a complete disaster, but we survived."),
           RA("British humour relies heavily on understatement and self-deprecation. Saying that something is not entirely terrible might actually be high praise, whereas calling it interesting could well be devastating criticism."),
+          LT("That could have gone a little better."),
         ],
       },
     ],
@@ -286,9 +405,14 @@ const UNITS: UnitDef[] = [
         title: "L'art du discours",
         exercises: [
           LR("Ask not what your country can do for you; ask what you can do for your country.", "Célèbre anaphore de J.F. Kennedy."),
+          LR("We shall not flag or fail. We shall go on to the end.", "Nous ne faiblirons ni n'échouerons. Nous irons jusqu'au bout. (Churchill)"),
           TS("Ce n'est pas la fin, ce n'est même pas le commencement de la fin.", "this is not the end it is not even the beginning of the end", "it is not the end it is not even the beginning of the end"),
+          TS("Choisissons le courage plutôt que le confort.", "let us choose courage over comfort", "let's choose courage over comfort"),
+          MC("Une « anaphore » consiste à :", ["répéter un mot en début de phrases", "poser une question", "conclure un discours", "citer un auteur"], "répéter un mot en début de phrases"),
+          WT("Les mots, maniés avec sagesse, peuvent changer le monde.", "words wielded wisely can change the world", "words used wisely can change the world"),
           RA("Ladies and gentlemen, we stand today at a crossroads. The choices we make in the coming months will echo for generations. Let us therefore choose courage over comfort, and substance over spectacle."),
           RA("Throughout history, the most enduring speeches have shared three qualities: clarity of purpose, rhythm of delivery, and an unshakeable conviction that words, wielded wisely, can change the world."),
+          LT("We stand today at a crossroads."),
         ],
       },
     ],
@@ -302,8 +426,11 @@ const UNITS: UnitDef[] = [
       {
         title: "Le présent simple",
         exercises: [
+          TS("Elle va au travail tous les jours.", "she goes to work every day"),
           MC("She ___ to work every day.", ["goes", "go", "going", "gone"], "goes", "3e personne du singulier"),
+          MC("We ___ television in the evening.", ["watch", "watches", "watching", "watched"], "watch"),
           FB("They ___ football on Sundays.", "play", "verbe « jouer »"),
+          FB("He ___ coffee every morning.", "drinks", "3e personne du singulier", "has"),
           WT("Il mange une pomme.", "he eats an apple", "he is eating an apple"),
           LT("I usually wake up at seven o'clock."),
         ],
@@ -311,17 +438,23 @@ const UNITS: UnitDef[] = [
       {
         title: "Questions et négations",
         exercises: [
-          MC("Comment dit-on « Je ne comprends pas » ?", ["I don't understand", "I don't understood", "I not understand", "I no understand"], "I don't understand"),
-          FB("___ you like coffee?", "do", "auxiliaire des questions"),
-          LT("Where do you live?"),
           TS("Est-ce que tu parles anglais ?", "do you speak english"),
+          MC("Comment dit-on « Je ne comprends pas » ?", ["I don't understand", "I don't understood", "I not understand", "I no understand"], "I don't understand"),
+          MC("___ she like tea?", ["Does", "Do", "Is", "Are"], "Does"),
+          FB("___ you like coffee?", "do", "auxiliaire des questions"),
+          FB("She ___ not live here.", "does", "auxiliaire à la 3e personne"),
+          WT("Nous ne travaillons pas le dimanche.", "we do not work on sundays", "we don't work on sundays", "we do not work on sunday"),
+          LT("Where do you live?"),
         ],
       },
       {
         title: "Le passé simple",
         exercises: [
+          TS("Hier, j'ai regardé un film.", "yesterday i watched a movie", "yesterday i watched a film"),
           MC("Yesterday, I ___ a great movie.", ["watched", "watch", "watching", "watches"], "watched", "action terminée hier"),
+          MC("They ___ to Spain last summer.", ["went", "goed", "gone", "going"], "went"),
           FB("I ___ my keys this morning.", "lost", "perdre, au passé", "forgot"),
+          FB("She ___ a beautiful song yesterday.", "sang", "chanter, au passé"),
           WT("Nous sommes allés au restaurant hier soir.", "we went to the restaurant last night", "we went to a restaurant last night", "we went to the restaurant yesterday evening"),
           LT("She bought a new car last week."),
         ],
@@ -338,17 +471,22 @@ const UNITS: UnitDef[] = [
         exercises: [
           MC("Quel mot signifie « célèbre » ?", ["famous", "favorite", "familiar", "funny"], "famous"),
           MC("« to borrow » signifie :", ["emprunter", "prêter", "acheter", "vendre"], "emprunter"),
+          MC("Le contraire de « expensive » est :", ["cheap", "rich", "costly", "large"], "cheap"),
           FB("Can I ___ your phone for a minute?", "borrow", "emprunter", "use"),
+          FB("This restaurant is quite ___, I can't afford it.", "expensive", "cher", "pricey"),
           WT("Je cherche un appartement près du centre-ville.", "i am looking for an apartment near the city center", "i'm looking for an apartment near the city centre", "i am looking for a flat near the city center"),
+          LT("I need to buy some groceries."),
         ],
       },
       {
         title: "Dictée intermédiaire",
         exercises: [
+          LR("She said she would call me back.", "Elle a dit qu'elle me rappellerait."),
+          WT("S'il pleut, nous resterons à la maison.", "if it rains we will stay at home", "if it rains we'll stay home", "if it rains we will stay home"),
+          RA("Learning a language is like building a house. You need strong foundations, patience, and daily practice. Every new word is another brick in the wall."),
           LT("If it rains tomorrow, we will stay at home."),
           LT("I have been learning English for two years."),
-          LR("She said she would call me back.", "Elle a dit qu'elle me rappellerait."),
-          RA("Learning a language is like building a house. You need strong foundations, patience, and daily practice. Every new word is another brick in the wall."),
+          LT("She promised to send the report by Monday."),
         ],
       },
     ],
@@ -362,19 +500,23 @@ const UNITS: UnitDef[] = [
       {
         title: "Grammaire avancée",
         exercises: [
+          TS("Si j'étais riche, je voyagerais partout.", "if i were rich i would travel everywhere", "if i was rich i would travel everywhere"),
           MC("If I ___ rich, I would travel the world.", ["were", "was", "am", "be"], "were", "conditionnel irréel"),
-          FB("She has been working here ___ 2015.", "since", "« depuis » + date précise"),
           MC("Que signifie « to give up » ?", ["abandonner", "donner", "monter", "offrir"], "abandonner"),
+          FB("She has been working here ___ 2015.", "since", "« depuis » + date précise"),
+          FB("I have lived here ___ ten years.", "for", "« depuis » + durée"),
           WT("J'aurais dû t'écouter.", "i should have listened to you"),
+          LT("Despite the heavy rain, the ceremony went ahead as planned."),
         ],
       },
       {
         title: "Dictée soutenue",
         exercises: [
-          LT("Despite the heavy rain, the ceremony went ahead as planned."),
-          LT("Had I known about the meeting, I would have attended."),
           LR("The report must be submitted by Friday at the latest.", "Le rapport doit être rendu vendredi au plus tard."),
+          WT("Si j'avais su, j'y serais allé.", "if i had known i would have gone", "had i known i would have gone"),
           RA("Negotiating effectively requires more than fluent speech. One must listen carefully, anticipate objections, and respond with both precision and tact, especially when the stakes are high."),
+          LT("Had I known about the meeting, I would have attended."),
+          LT("The decision was postponed until further notice."),
         ],
       },
     ],
@@ -389,8 +531,11 @@ const UNITS: UnitDef[] = [
         exercises: [
           MC("« ubiquitous » signifie :", ["omniprésent", "ambigu", "obsolète", "urgent"], "omniprésent"),
           MC("The evidence was purely ___.", ["circumstantial", "circumstance", "circumscribed", "circulatory"], "circumstantial", "indices indirects"),
+          MC("« meticulous » veut dire :", ["minutieux", "paresseux", "rapide", "malhonnête"], "minutieux"),
           FB("The politician was accused of ___ the truth.", "distorting", "déformer", "twisting", "bending"),
+          FB("Her argument was ___ and hard to follow.", "convoluted", "alambiqué", "confusing"),
           WT("Quoi qu'il arrive, nous devons rester objectifs.", "whatever happens we must remain objective", "no matter what happens we must remain objective", "whatever happens we have to stay objective"),
+          LT("The committee reached a unanimous decision."),
         ],
       },
     ],
@@ -403,21 +548,138 @@ const UNITS: UnitDef[] = [
       {
         title: "Dictée d'expert",
         exercises: [
+          MC("« to eschew » signifie :", ["éviter délibérément", "mâcher", "poursuivre", "saluer"], "éviter délibérément"),
+          MC("« ephemeral » veut dire :", ["éphémère", "éternel", "énorme", "évident"], "éphémère"),
+          RA("Peter Piper picked a peck of pickled peppers. She sells seashells by the seashore. How much wood would a woodchuck chuck if a woodchuck could chuck wood?"),
           LT("The unprecedented circumstances necessitated an entirely novel approach."),
           LT("Notwithstanding the committee's reservations, the proposal was unanimously approved."),
-          MC("« to eschew » signifie :", ["éviter délibérément", "mâcher", "poursuivre", "saluer"], "éviter délibérément"),
-          RA("Peter Piper picked a peck of pickled peppers. She sells seashells by the seashore. How much wood would a woodchuck chuck if a woodchuck could chuck wood?"),
         ],
       },
       {
         title: "Traduction magistrale",
         exercises: [
-          WT("La procrastination est le voleur du temps.", "procrastination is the thief of time"),
           MC("Choisis la tournure la plus idiomatique pour « Il pleut des cordes » :", ["It's raining cats and dogs", "It rains ropes", "It's raining strings", "Water is falling hard"], "It's raining cats and dogs"),
-          LT("Eloquence is the art of saying the right thing at the right moment."),
+          WT("La procrastination est le voleur du temps.", "procrastination is the thief of time"),
+          WT("La véritable éloquence consiste à dire ce qu'il faut, et rien de plus.", "true eloquence consists in saying what is needed and nothing more", "true eloquence is saying what is necessary and nothing more"),
           RA("True mastery of a foreign language reveals itself not in flawless grammar, but in the effortless dance between wit, nuance, and timing that native speakers perform without a second thought."),
+          LT("Eloquence is the art of saying the right thing at the right moment."),
         ],
       },
+    ],
+  },
+];
+
+// ---------- Tests de fin de niveau (notés sur 20) ----------
+// Un examen par niveau. Le réussir (score ≥ passScore %) débloque le niveau
+// suivant. Les questions mélangent tous les types déjà pratiqués dans le niveau.
+const EXAMS: ExamDef[] = [
+  {
+    cefrLevel: "A1",
+    title: "Test de niveau A1",
+    description: "Salutations, café, nombres, famille et déplacements. Réussis-le pour débloquer l'A2.",
+    exercises: [
+      TS("Bonjour, comment ça va ?", "hello how are you", "hi how are you"),
+      TS("Je m'appelle Marie.", "my name is marie", "i am marie", "i'm marie"),
+      TS("Je voudrais un café, s'il vous plaît.", "i would like a coffee please", "i want a coffee please", "can i have a coffee please"),
+      TS("Où est la gare ?", "where is the train station", "where is the station"),
+      MC("Comment dit-on « merci beaucoup » ?", ["thank you very much", "please very much", "you are welcome", "sorry very much"], "thank you very much"),
+      MC("« I have two sisters » signifie :", ["J'ai deux sœurs", "J'ai deux frères", "J'ai deux amis", "J'ai deux enfants"], "J'ai deux sœurs"),
+      FB("___ morning! (le matin)", "good", "bonjour le matin"),
+      FB("A ticket ___ London, please.", "to", "direction"),
+      WT("Combien ça coûte ?", "how much is it", "how much does it cost"),
+      LT("My name is Anna."),
+      LT("There are ten people here."),
+    ],
+  },
+  {
+    cefrLevel: "A2",
+    title: "Test de niveau A2",
+    description: "Voyage, achats, restaurant et grammaire de base. Réussis-le pour débloquer le B1.",
+    exercises: [
+      TS("Je voudrais une chambre pour deux nuits.", "i would like a room for two nights", "i want a room for two nights"),
+      TS("Puis-je payer par carte ?", "can i pay by card", "may i pay by card"),
+      TS("Une table pour deux, s'il vous plaît.", "a table for two please"),
+      MC("She ___ to work every day.", ["goes", "go", "going", "gone"], "goes", "présent simple, 3e personne"),
+      MC("Yesterday, I ___ a great movie.", ["watched", "watch", "watching", "watches"], "watched"),
+      MC("« too expensive » signifie :", ["trop cher", "trop grand", "trop petit", "pas cher"], "trop cher"),
+      FB("___ you like coffee?", "do", "auxiliaire des questions"),
+      FB("My flight is ___, I have to wait.", "delayed", "retardé", "late"),
+      WT("Nous sommes allés au restaurant hier soir.", "we went to the restaurant last night", "we went to a restaurant last night"),
+      WT("Est-ce que tu parles anglais ?", "do you speak english"),
+      LT("Breakfast is served at eight."),
+      LT("I usually wake up at seven o'clock."),
+    ],
+  },
+  {
+    cefrLevel: "B1",
+    title: "Test de niveau B1",
+    description: "Loisirs, opinions, travail et vocabulaire courant. Réussis-le pour débloquer le B2.",
+    exercises: [
+      TS("Je fais du sport trois fois par semaine.", "i play sports three times a week", "i do sports three times a week", "i exercise three times a week"),
+      TS("Je pense que tu as raison.", "i think you are right", "i think you're right"),
+      TS("Pourquoi voulez-vous travailler ici ?", "why do you want to work here"),
+      MC("« to borrow » signifie :", ["emprunter", "prêter", "acheter", "vendre"], "emprunter"),
+      MC("« I couldn't agree more » veut dire :", ["Je suis tout à fait d'accord", "Je ne suis pas d'accord", "Je ne sais pas", "Peut-être"], "Je suis tout à fait d'accord"),
+      MC("Quel mot signifie « célèbre » ?", ["famous", "favorite", "familiar", "funny"], "famous"),
+      FB("In my ___, the book is better than the film.", "opinion", "avis", "view"),
+      FB("Can I ___ your phone for a minute?", "borrow", "emprunter", "use"),
+      WT("D'après moi, c'est une bonne idée.", "in my opinion it is a good idea", "in my opinion it's a good idea", "i think it is a good idea"),
+      WT("S'il pleut, nous resterons à la maison.", "if it rains we will stay at home", "if it rains we'll stay home", "if it rains we will stay home"),
+      LT("I have been learning English for two years."),
+      LT("She said she would call me back."),
+    ],
+  },
+  {
+    cefrLevel: "B2",
+    title: "Test de niveau B2",
+    description: "Désaccord, nuance, grammaire avancée et idiomes. Réussis-le pour débloquer le C1.",
+    exercises: [
+      TS("Ce n'est pas aussi simple que ça en a l'air.", "it is not as simple as it seems", "it's not as simple as it looks", "it is not as simple as it looks"),
+      TS("Tout bien considéré, je pense que cela en vaut la peine.", "all things considered i think it is worth it", "all things considered i think it's worth it"),
+      MC("If I ___ rich, I would travel the world.", ["were", "was", "am", "be"], "were", "conditionnel irréel"),
+      MC("« nevertheless » veut dire :", ["néanmoins", "par exemple", "en effet", "d'abord"], "néanmoins"),
+      MC("Que signifie « to give up » ?", ["abandonner", "donner", "monter", "offrir"], "abandonner"),
+      FB("She has been working here ___ 2015.", "since", "« depuis » + date"),
+      FB("On the one hand it is cheap; on the ___ hand it is risky.", "other", "l'autre côté"),
+      WT("J'aurais dû t'écouter.", "i should have listened to you"),
+      WT("Je crains de devoir contester cette affirmation.", "i am afraid i have to disagree with that statement", "i'm afraid i have to disagree with that statement"),
+      LT("Despite the heavy rain, the ceremony went ahead as planned."),
+      LT("Had I known about the meeting, I would have attended."),
+    ],
+  },
+  {
+    cefrLevel: "C1",
+    title: "Test de niveau C1",
+    description: "Ironie, registres et finesse lexicale. Réussis-le pour débloquer le C2.",
+    exercises: [
+      TS("Disons que ça aurait pu mieux se passer.", "let's just say it could have gone better", "let us just say it could have gone better"),
+      TS("Quoi qu'il arrive, nous devons rester objectifs.", "whatever happens we must remain objective", "no matter what happens we must remain objective"),
+      MC("« ubiquitous » signifie :", ["omniprésent", "ambigu", "obsolète", "urgent"], "omniprésent"),
+      MC("« meticulous » veut dire :", ["minutieux", "paresseux", "rapide", "malhonnête"], "minutieux"),
+      MC("« That's rich, coming from you » exprime :", ["l'ironie / le reproche", "un compliment", "un remerciement", "une excuse"], "l'ironie / le reproche"),
+      FB("The politician was accused of ___ the truth.", "distorting", "déformer", "twisting", "bending"),
+      FB("Let's just say it could have gone ___.", "better", "mieux"),
+      WT("Honnêtement, c'était un désastre, mais on a survécu.", "honestly it was a disaster but we survived", "honestly it was a complete disaster but we survived"),
+      RA("British humour relies heavily on understatement and self-deprecation. Saying that something is not entirely terrible might actually be high praise."),
+      LT("The committee reached a unanimous decision."),
+      LT("That could have gone a little better."),
+    ],
+  },
+  {
+    cefrLevel: "C2",
+    title: "Test de niveau C2",
+    description: "Éloquence, dictées d'expert et traduction littéraire. Le sommet du parcours.",
+    exercises: [
+      TS("Ce n'est pas la fin, ce n'est même pas le commencement de la fin.", "this is not the end it is not even the beginning of the end", "it is not the end it is not even the beginning of the end"),
+      TS("Choisissons le courage plutôt que le confort.", "let us choose courage over comfort", "let's choose courage over comfort"),
+      MC("« to eschew » signifie :", ["éviter délibérément", "mâcher", "poursuivre", "saluer"], "éviter délibérément"),
+      MC("« ephemeral » veut dire :", ["éphémère", "éternel", "énorme", "évident"], "éphémère"),
+      MC("Choisis la tournure la plus idiomatique pour « Il pleut des cordes » :", ["It's raining cats and dogs", "It rains ropes", "It's raining strings", "Water is falling hard"], "It's raining cats and dogs"),
+      WT("La procrastination est le voleur du temps.", "procrastination is the thief of time"),
+      WT("Les mots, maniés avec sagesse, peuvent changer le monde.", "words wielded wisely can change the world", "words used wisely can change the world"),
+      RA("True mastery of a foreign language reveals itself not in flawless grammar, but in the effortless dance between wit, nuance, and timing."),
+      LT("The unprecedented circumstances necessitated an entirely novel approach."),
+      LT("Eloquence is the art of saying the right thing at the right moment."),
     ],
   },
 ];
@@ -445,9 +707,11 @@ async function main() {
   await prisma.userBadge.deleteMany();
   await prisma.badge.deleteMany();
   await prisma.exerciseAttempt.deleteMany();
+  await prisma.examResult.deleteMany();
   await prisma.lessonProgress.deleteMany();
   await prisma.exercise.deleteMany();
   await prisma.lesson.deleteMany();
+  await prisma.exam.deleteMany();
   await prisma.unit.deleteMany();
 
   let unitOrder: Record<string, number> = {};
@@ -463,7 +727,7 @@ async function main() {
         data: { unitId: unit.id, title: l.title, sortOrder: li, xpReward: l.xp ?? 15 },
       });
       let ei = 0;
-      for (const ex of l.exercises) {
+      for (const ex of byType(l.exercises)) {
         ei++;
         await prisma.exercise.create({
           data: { lessonId: lesson.id, type: ex.type, sortOrder: ei, content: JSON.stringify(ex), minScore: 55 },
@@ -472,11 +736,40 @@ async function main() {
     }
   }
 
+  let examOrder = 0;
+  for (const e of EXAMS) {
+    examOrder++;
+    const exam = await prisma.exam.create({
+      data: {
+        cefrLevel: e.cefrLevel,
+        title: e.title,
+        description: e.description,
+        sortOrder: examOrder,
+        xpReward: e.xp ?? 50,
+        passScore: e.passScore ?? 60,
+      },
+    });
+    let ei = 0;
+    for (const ex of byType(e.exercises)) {
+      ei++;
+      await prisma.exercise.create({
+        data: { examId: exam.id, type: ex.type, sortOrder: ei, content: JSON.stringify(ex), minScore: 55 },
+      });
+    }
+  }
+
   for (const b of BADGES) {
     await prisma.badge.create({ data: b });
   }
 
-  console.log("Seed terminé :", UNITS.length, "unités,", UNITS.reduce((n, u) => n + u.lessons.length, 0), "leçons.");
+  const lessonCount = UNITS.reduce((n, u) => n + u.lessons.length, 0);
+  const exerciseCount =
+    UNITS.reduce((n, u) => n + u.lessons.reduce((m, l) => m + l.exercises.length, 0), 0) +
+    EXAMS.reduce((n, e) => n + e.exercises.length, 0);
+  console.log(
+    "Seed terminé :", UNITS.length, "unités,", lessonCount, "leçons,",
+    EXAMS.length, "tests de niveau,", exerciseCount, "exercices."
+  );
 }
 
 main().finally(() => prisma.$disconnect());

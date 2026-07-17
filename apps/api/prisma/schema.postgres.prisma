@@ -21,10 +21,11 @@ model User {
   longestStreak   Int      @default(0)
   lastActiveDay   String?
 
-  progress LessonProgress[]
-  attempts ExerciseAttempt[]
-  badges   UserBadge[]
-  xpEvents XpEvent[]
+  progress    LessonProgress[]
+  attempts    ExerciseAttempt[]
+  badges      UserBadge[]
+  xpEvents    XpEvent[]
+  examResults ExamResult[]
 }
 
 model Unit {
@@ -52,14 +53,43 @@ model Lesson {
 }
 
 model Exercise {
-  id        String @id @default(cuid())
-  lessonId  String
-  lesson    Lesson @relation(fields: [lessonId], references: [id])
+  id        String  @id @default(cuid())
+  lessonId  String?
+  lesson    Lesson? @relation(fields: [lessonId], references: [id])
+  examId    String?
+  exam      Exam?   @relation(fields: [examId], references: [id])
   type      String
   sortOrder Int
   content   String
-  minScore  Int    @default(55)
+  minScore  Int     @default(55)
   attempts  ExerciseAttempt[]
+}
+
+// Test de fin de niveau (noté sur 20). Réussir l'examen d'un niveau débloque
+// le niveau CECRL suivant. Un examen par niveau (A1 → C2).
+model Exam {
+  id          String       @id @default(cuid())
+  cefrLevel   String       @unique
+  title       String
+  description String
+  sortOrder   Int
+  xpReward    Int          @default(50)
+  passScore   Int          @default(60) // pourcentage requis (60 % = 12/20)
+  exercises   Exercise[]
+  results     ExamResult[]
+}
+
+model ExamResult {
+  userId      String
+  examId      String
+  user        User      @relation(fields: [userId], references: [id])
+  exam        Exam      @relation(fields: [examId], references: [id])
+  bestScore   Int       @default(0) // meilleur pourcentage obtenu
+  passed      Boolean   @default(false)
+  attempts    Int       @default(0)
+  completedAt DateTime?
+
+  @@id([userId, examId])
 }
 
 model LessonProgress {

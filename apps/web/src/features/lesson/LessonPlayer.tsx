@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { api, AttemptResult, CompleteResult, ExerciseDto, ExerciseType, LessonDto } from "../../lib/api";
-import { speak, speechRecognitionSupported, startRecognition, RecognitionHandle } from "../../lib/speech";
+import { api, AttemptResult, CompleteResult, ExerciseType, LessonDto } from "../../lib/api";
+import { speechRecognitionSupported, startRecognition, RecognitionHandle } from "../../lib/speech";
+import ExercisePrompt from "./ExercisePrompt";
 
 const TYPE_TITLES: Record<ExerciseType, string> = {
   LISTEN_REPEAT: "Écoute puis répète",
@@ -14,19 +15,24 @@ const TYPE_TITLES: Record<ExerciseType, string> = {
 };
 
 const TYPE_HINTS: Record<ExerciseType, string> = {
-  LISTEN_REPEAT: "Appuie sur 🔊 pour écouter, puis répète la phrase en anglais.",
-  TRANSLATE_SPEAK: "Dis la traduction anglaise de cette phrase.",
+  LISTEN_REPEAT: "Appuie sur 🔊 pour écouter, puis enregistre-toi en répétant la phrase.",
+  TRANSLATE_SPEAK: "Enregistre la traduction anglaise de cette phrase.",
   ROLEPLAY: "Choisis une des réponses et dis-la à voix haute.",
   READ_ALOUD: "Lis le paragraphe entier. Chaque mot compte !",
-  MULTIPLE_CHOICE: "Une seule réponse est correcte.",
-  FILL_BLANK: "Écris le mot manquant en anglais.",
-  WRITE_TRANSLATION: "Écris la traduction anglaise de cette phrase.",
+  MULTIPLE_CHOICE: "Sélectionne une réponse puis valide.",
+  FILL_BLANK: "Écris le mot manquant en anglais puis valide.",
+  WRITE_TRANSLATION: "Écris la traduction anglaise puis valide.",
   LISTEN_TYPE: "Écoute 🔊 autant de fois que nécessaire, puis écris ce que tu entends.",
 };
 
 const ORAL_TYPES: ExerciseType[] = ["LISTEN_REPEAT", "TRANSLATE_SPEAK", "ROLEPLAY", "READ_ALOUD"];
 
-type Phase = "idle" | "recording" | "scoring" | "result";
+// idle    : saisie de la réponse (choix, micro prêt, ou clavier)
+// recording : micro en cours
+// review  : réponse orale capturée, en attente de validation
+// scoring : envoi au serveur
+// result  : résultat affiché
+type Phase = "idle" | "recording" | "review" | "scoring" | "result";
 
 export default function LessonPlayer({
   lessonId,
@@ -42,12 +48,13 @@ export default function LessonPlayer({
   const [lesson, setLesson] = useState<LessonDto | null>(null);
   const [idx, setIdx] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState(""); // réponse orale capturée
+  const [selectedOption, setSelectedOption] = useState<string | null>(null); // QCM
+  const [typed, setTyped] = useState(""); // clavier
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [hearts, setHearts] = useState(initialHearts);
   const [error, setError] = useState("");
   const [keyboardMode, setKeyboardMode] = useState(!speechRecognitionSupported());
-  const [typed, setTyped] = useState("");
   const [revealed, setRevealed] = useState<string | null>(null);
   const [outOfHearts, setOutOfHearts] = useState(false);
   const recRef = useRef<RecognitionHandle | null>(null);
@@ -82,8 +89,12 @@ export default function LessonPlayer({
       onInterim: (t) => setTranscript(t),
       onFinal: (t) => {
         recRef.current = null;
-        if (t) submitTranscript(t);
-        else {
+        // On NE valide plus automatiquement : on repasse en relecture pour que
+        // le joueur confirme (ou recommence) avant que ce soit comptabilisé.
+        if (t) {
+          setTranscript(t);
+          setPhase("review");
+        } else {
           setPhase("idle");
           setError("Je n'ai rien entendu. Réessaie !");
         }
@@ -101,9 +112,9 @@ export default function LessonPlayer({
     recRef.current?.stop();
   };
 
-  const submitTranscript = async (text: string) => {
+  const submitAnswer = async (text: string) => {
+    if (!text.trim()) return;
     setPhase("scoring");
-    setTranscript(text);
     setError("");
     try {
       const r = await api.attempt(exercise.id, text);
@@ -130,11 +141,16 @@ export default function LessonPlayer({
     }
   };
 
-  const next = async () => {
-    setResult(null);
+  const resetInputs = () => {
     setTranscript("");
+    setSelectedOption(null);
     setTyped("");
     setError("");
+  };
+
+  const next = async () => {
+    setResult(null);
+    resetInputs();
     setRevealed(null);
     if (idx + 1 < lesson.exercises.length) {
       setIdx(idx + 1);
@@ -153,8 +169,7 @@ export default function LessonPlayer({
 
   const retry = () => {
     setResult(null);
-    setTranscript("");
-    setTyped("");
+    resetInputs();
     setPhase("idle");
   };
 
@@ -197,33 +212,59 @@ export default function LessonPlayer({
         {phase !== "result" && (
           <div className="answer-zone">
             {isChoice ? (
-              <div className="options">
-                {exercise.content.options!.map((opt, i) => (
-                  <button
-                    key={i}
-                    className="option-btn"
-                    disabled={phase === "scoring"}
-                    onClick={() => submitTranscript(opt)}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="options">
+                  {exercise.content.options!.map((opt, i) => (
+                    <button
+                      key={i}
+                      className={`option-btn ${selectedOption === opt ? "selected" : ""}`}
+                      disabled={phase === "scoring"}
+                      onClick={() => setSelectedOption(opt)}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  className="btn btn-primary btn-block"
+                  disabled={!selectedOption || phase === "scoring"}
+                  onClick={() => submitAnswer(selectedOption!)}
+                >
+                  {phase === "scoring" ? "Évaluation…" : "Valider ma réponse"}
+                </button>
+              </>
             ) : isOral && !keyboardMode ? (
               <>
                 {phase === "recording" ? (
-                  <button className="mic recording" onClick={stopRecording}>
-                    ⏹ J'ai fini de parler
-                  </button>
+                  <>
+                    <button className="mic recording" onClick={stopRecording}>
+                      ⏹ Arrêter l'enregistrement
+                    </button>
+                    {transcript && <p className="live-transcript">« {transcript} »</p>}
+                  </>
+                ) : phase === "review" ? (
+                  <div className="review-zone">
+                    <p className="captured-label">Ta réponse enregistrée :</p>
+                    <p className="live-transcript">« {transcript} »</p>
+                    <div className="review-actions">
+                      <button className="btn btn-primary" onClick={() => submitAnswer(transcript)}>
+                        ✅ Valider
+                      </button>
+                      <button className="btn btn-ghost" onClick={startRecording}>
+                        🔁 Recommencer
+                      </button>
+                    </div>
+                  </div>
                 ) : (
                   <button className="mic" onClick={startRecording} disabled={phase === "scoring"}>
-                    🎤 {phase === "scoring" ? "Évaluation…" : "Appuie et parle"}
+                    🎤 {phase === "scoring" ? "Évaluation…" : "Appuie pour enregistrer"}
                   </button>
                 )}
-                {transcript && phase === "recording" && <p className="live-transcript">« {transcript} »</p>}
-                <button className="link" onClick={() => setKeyboardMode(true)}>
-                  Problème de micro ? Écrire la réponse
-                </button>
+                {phase !== "review" && (
+                  <button className="link" onClick={() => setKeyboardMode(true)}>
+                    Problème de micro ? Écrire la réponse
+                  </button>
+                )}
               </>
             ) : (
               <div className="keyboard-zone">
@@ -240,11 +281,11 @@ export default function LessonPlayer({
                   rows={2}
                 />
                 <button
-                  className="btn btn-primary"
+                  className="btn btn-primary btn-block"
                   disabled={!typed.trim() || phase === "scoring"}
-                  onClick={() => submitTranscript(typed)}
+                  onClick={() => submitAnswer(typed)}
                 >
-                  Valider
+                  {phase === "scoring" ? "Évaluation…" : "Valider ma réponse"}
                 </button>
                 {isOral && speechRecognitionSupported() && (
                   <button className="link" onClick={() => setKeyboardMode(false)}>
@@ -254,7 +295,7 @@ export default function LessonPlayer({
               </div>
             )}
 
-            {!revealed && phase !== "scoring" && (
+            {!revealed && phase !== "scoring" && phase !== "recording" && (
               <button className="link reveal-link" onClick={revealSolution}>
                 💡 Je ne sais pas — voir la réponse (−1 ❤️)
               </button>
@@ -283,8 +324,14 @@ export default function LessonPlayer({
               </div>
             </div>
 
-            {!isChoice && <p className="muted">Ce que j'ai {isOral ? "entendu" : "lu"} : « {transcript} »</p>}
-            {!result.passed && <p className="muted">Réponse attendue : « {result.expected} »</p>}
+            {!isChoice && <p className="muted">Ce que j'ai {isOral ? "entendu" : "lu"} : « {transcript || typed} »</p>}
+
+            {/* Dès que ce n'est pas parfait (100 %), on montre la bonne réponse. */}
+            {result.score < 100 && result.expected && (
+              <div className="correct-answer">
+                ✅ Bonne réponse : <strong>{result.expected}</strong>
+              </div>
+            )}
 
             {(exercise.type === "READ_ALOUD" || exercise.type === "LISTEN_TYPE") && result.wordScores.length > 0 && (
               <div className="word-chips">
@@ -314,78 +361,4 @@ export default function LessonPlayer({
       </main>
     </div>
   );
-}
-
-function ExercisePrompt({ exercise }: { exercise: ExerciseDto }) {
-  const c = exercise.content;
-  switch (exercise.type) {
-    case "LISTEN_REPEAT":
-      return (
-        <div className="prompt-card">
-          <button className="btn btn-speaker" onClick={() => speak(c.textEn!)}>🔊 Écouter</button>
-          <p className="prompt-main">{c.textEn}</p>
-          {c.hintFr && <p className="muted">{c.hintFr}</p>}
-        </div>
-      );
-    case "TRANSLATE_SPEAK":
-      return (
-        <div className="prompt-card">
-          <p className="prompt-main">🇫🇷 « {c.textFr} »</p>
-          <p className="muted">→ Dis-le en anglais 🇬🇧</p>
-        </div>
-      );
-    case "WRITE_TRANSLATION":
-      return (
-        <div className="prompt-card">
-          <p className="prompt-main">🇫🇷 « {c.textFr} »</p>
-          <p className="muted">→ Écris-le en anglais 🇬🇧</p>
-        </div>
-      );
-    case "ROLEPLAY":
-      return (
-        <div className="prompt-card">
-          <p className="muted">{c.contextFr}</p>
-          <div className="npc-bubble">
-            <strong>{c.npcName} :</strong> {c.npcLine}{" "}
-            <button className="btn btn-speaker small" onClick={() => speak(c.npcLine!)}>🔊</button>
-          </div>
-          <div className="choices">
-            {c.choices!.map((choice, i) => (
-              <div key={i} className="choice">
-                💬 {choice} <button className="btn btn-speaker small" onClick={() => speak(choice)}>🔊</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    case "READ_ALOUD":
-      return (
-        <div className="prompt-card">
-          <p className="prompt-paragraph">{c.paragraphEn}</p>
-        </div>
-      );
-    case "MULTIPLE_CHOICE":
-      return (
-        <div className="prompt-card">
-          <p className="prompt-main">{c.prompt}</p>
-          {c.hintFr && <p className="muted">💭 {c.hintFr}</p>}
-        </div>
-      );
-    case "FILL_BLANK":
-      return (
-        <div className="prompt-card">
-          <p className="prompt-main">{c.sentence!.split("___")[0]}<span className="blank">______</span>{c.sentence!.split("___")[1]}</p>
-          {c.hintFr && <p className="muted">💭 Indice : {c.hintFr}</p>}
-        </div>
-      );
-    case "LISTEN_TYPE":
-      return (
-        <div className="prompt-card listen-type">
-          <button className="btn btn-speaker big" onClick={() => speak(c.textEn!, 0.85)}>
-            🔊 Écouter la phrase
-          </button>
-          <p className="muted">La phrase reste secrète — fais confiance à tes oreilles !</p>
-        </div>
-      );
-  }
 }

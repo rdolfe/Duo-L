@@ -37,6 +37,33 @@ export function nextStreak(user: User): number {
 // Ordre des niveaux CECRL.
 export const CEFR_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
+// Niveaux CECRL débloqués pour un utilisateur.
+// Règle : A1 est toujours ouvert ; un niveau s'ouvre quand l'examen du niveau
+// précédent est réussi. Garde-fou de migration : un niveau où l'utilisateur a
+// déjà terminé au moins une leçon reste ouvert (ne jamais reverrouiller un
+// joueur existant lors de l'ajout des examens).
+export async function unlockedLevelSet(prisma: PrismaClient, userId: string): Promise<Set<string>> {
+  const [exams, progress] = await Promise.all([
+    prisma.exam.findMany({
+      select: { cefrLevel: true, results: { where: { userId }, select: { passed: true } } },
+    }),
+    prisma.lessonProgress.findMany({
+      where: { userId, completedAt: { not: null } },
+      select: { lesson: { select: { unit: { select: { cefrLevel: true } } } } },
+    }),
+  ]);
+  const passedLevel = new Set(exams.filter((e) => e.results[0]?.passed).map((e) => e.cefrLevel));
+  const startedLevel = new Set(progress.map((p) => p.lesson.unit.cefrLevel));
+
+  const unlocked = new Set<string>();
+  let previousPassed = true; // avant A1
+  for (const lvl of CEFR_ORDER) {
+    if (previousPassed || startedLevel.has(lvl)) unlocked.add(lvl);
+    previousPassed = passedLevel.has(lvl);
+  }
+  return unlocked;
+}
+
 // Vérifie et attribue les badges manquants. Retourne les nouveaux badges.
 export async function checkBadges(prisma: PrismaClient, userId: string, opts: { perfectLesson?: boolean } = {}) {
   const [user, lessonsCompleted, owned, badges] = await Promise.all([

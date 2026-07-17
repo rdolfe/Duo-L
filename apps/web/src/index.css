@@ -338,6 +338,98 @@ p { margin: 0 0 8px; }
   animation: pop 0.3s ease;
 }
 
+/* ---------- Validation & bonne réponse ---------- */
+.option-btn.selected {
+  border-color: var(--blue);
+  background: #eaf7ff;
+  box-shadow: 0 0 0 3px rgba(28, 176, 246, 0.25);
+}
+.review-zone {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.captured-label { font-weight: 700; margin-bottom: 4px; }
+.review-actions { display: flex; gap: 10px; justify-content: center; margin-top: 12px; }
+.correct-answer {
+  background: var(--green-light);
+  border: 2px solid var(--green);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+/* ---------- Niveaux (parcours groupé) ---------- */
+.level-block {
+  border-top: 2px dashed var(--border);
+  padding-top: 14px;
+  margin-bottom: 26px;
+}
+.level-block:first-child { border-top: none; padding-top: 0; }
+.level-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.level-chip.big { font-size: 18px; padding: 6px 16px; border-radius: 12px; }
+.lock-note { color: var(--muted); font-size: 14px; font-weight: 700; }
+.level-locked .unit-card,
+.level-locked .exam-card { opacity: 0.6; }
+
+/* ---------- Carte de test de niveau ---------- */
+.exam-card {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 6px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: linear-gradient(135deg, #fffef6, #fff7e0);
+}
+.exam-card.unlocked { border-color: var(--yellow); }
+.exam-card.passed { border-color: var(--green); background: var(--green-light); }
+.exam-card.locked { background: #f4f4f4; }
+.exam-card-head { display: flex; gap: 14px; align-items: center; }
+.exam-card-head p { color: var(--muted); font-size: 14px; margin: 4px 0 0; }
+.exam-emoji { font-size: 34px; }
+
+/* ---------- Test en cours ---------- */
+.exam-track .progress-fill { background: var(--yellow); }
+.exam-banner {
+  background: #fff7e0;
+  border: 2px solid var(--yellow);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-weight: 800;
+  color: #8a6d00;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.exam-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-top: 16px; }
+
+/* ---------- Résultat du test (/20) ---------- */
+.exam-result { padding-top: 16px; }
+.exam-score-panel { text-align: center; max-width: 560px; margin: 0 auto 16px; }
+.score-on20 { margin: 6px 0; }
+.score-on20 .score-num { font-size: 64px; font-weight: 800; }
+.score-on20 .score-den { font-size: 28px; font-weight: 700; color: var(--muted); }
+.score-on20.ok .score-num { color: var(--green); }
+.score-on20.ko .score-num { color: var(--red); }
+.exam-verdict { font-weight: 700; margin: 8px 0 4px; }
+.exam-verdict.ok { color: var(--green-dark); }
+.exam-verdict.ko { color: var(--red); }
+.exam-review { list-style: none; margin: 0; padding: 0; }
+.rev { border: 2px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
+.rev.pass { border-color: var(--green); background: var(--green-light); }
+.rev.fail { border-color: var(--red); background: #ffefef; }
+.rev-head { display: flex; gap: 10px; align-items: center; font-weight: 700; }
+.rev-type { flex: 1; }
+.rev-score { font-weight: 800; }
+.rev-body { margin-top: 6px; }
+.rev-body .muted { margin: 4px 0; }
+.rev-body .correct-answer { margin: 6px 0 0; }
+
 /* ---------- Mobile ---------- */
 @media (max-width: 520px) {
   .shell { padding: 0 12px 40px; }

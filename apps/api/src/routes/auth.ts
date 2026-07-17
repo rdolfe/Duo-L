@@ -1,20 +1,20 @@
 import { FastifyInstance } from "fastify";
 import bcrypt from "bcryptjs";
-import { refreshHearts, CEFR_ORDER } from "../lib/gamification.js";
+import { refreshHearts, CEFR_ORDER, unlockedLevelSet } from "../lib/gamification.js";
 
 export async function userStats(app: FastifyInstance, userId: string) {
   let user = await app.prisma.user.findUniqueOrThrow({ where: { id: userId } });
   user = await refreshHearts(app.prisma, user);
 
-  // Niveau CECRL atteint = plus haut niveau avec au moins une leçon terminée.
-  const completed = await app.prisma.lessonProgress.findMany({
-    where: { userId, completedAt: { not: null } },
-    include: { lesson: { include: { unit: true } } },
-  });
+  // Niveau CECRL atteint = plus haut niveau débloqué (les examens de niveau
+  // ouvrent les niveaux supérieurs).
+  const [completed, unlocked] = await Promise.all([
+    app.prisma.lessonProgress.findMany({ where: { userId, completedAt: { not: null } } }),
+    unlockedLevelSet(app.prisma, userId),
+  ]);
   let cefrLevel = "A1";
-  for (const p of completed) {
-    const lvl = p.lesson.unit.cefrLevel;
-    if (CEFR_ORDER.indexOf(lvl) > CEFR_ORDER.indexOf(cefrLevel)) cefrLevel = lvl;
+  for (const lvl of CEFR_ORDER) {
+    if (unlocked.has(lvl)) cefrLevel = lvl;
   }
 
   return {

@@ -29,6 +29,25 @@ export type UnitSummary = {
   lessons: LessonSummary[];
 };
 
+export type ExamSummary = {
+  id: string;
+  title: string;
+  description: string;
+  exerciseCount: number;
+  xpReward: number;
+  passScore: number;
+  status: "LOCKED" | "UNLOCKED" | "PASSED";
+  bestScore: number | null;
+  bestOn20: number | null;
+};
+
+export type LevelDto = {
+  cefrLevel: string;
+  unlocked: boolean;
+  units: UnitSummary[];
+  exam: ExamSummary | null;
+};
+
 export type ExerciseType =
   | "LISTEN_REPEAT"
   | "TRANSLATE_SPEAK"
@@ -64,6 +83,39 @@ export type LessonDto = {
   xpReward: number;
   unit: { title: string; cefrLevel: string };
   exercises: ExerciseDto[];
+};
+
+export type ExamDto = {
+  id: string;
+  title: string;
+  description: string;
+  cefrLevel: string;
+  xpReward: number;
+  passScore: number;
+  bestOn20: number | null;
+  passed: boolean;
+  exercises: ExerciseDto[];
+};
+
+export type ExamAnswerDetail = {
+  exerciseId: string;
+  type: ExerciseType;
+  score: number;
+  correctAnswer: string;
+  yourAnswer: string;
+  passed: boolean;
+};
+
+export type ExamSubmitResult = {
+  scoreOn20: number;
+  scorePercent: number;
+  passed: boolean;
+  passScore: number;
+  justUnlockedNext: boolean;
+  xpGained: number;
+  details: ExamAnswerDetail[];
+  newBadges: Badge[];
+  stats: UserStats;
 };
 
 export type AttemptResult = {
@@ -126,12 +178,15 @@ export const api = {
   login: (email: string, password: string) =>
     request<{ token: string; user: UserStats }>("POST", "/api/auth/login", { email, password }),
   me: () => request<UserStats>("GET", "/api/me"),
-  units: () => request<UnitSummary[]>("GET", "/api/units"),
+  path: () => request<LevelDto[]>("GET", "/api/path"),
   lesson: (id: string) => request<LessonDto>("GET", `/api/lessons/${id}`),
   attempt: (exerciseId: string, transcript: string) =>
     request<AttemptResult>("POST", "/api/attempts", { exerciseId, transcript }),
   reveal: (exerciseId: string) =>
     request<{ answer: string; hearts: number }>("POST", `/api/exercises/${exerciseId}/reveal`, {}),
   completeLesson: (id: string) => request<CompleteResult>("POST", `/api/lessons/${id}/complete`),
+  exam: (id: string) => request<ExamDto>("GET", `/api/exams/${id}`),
+  submitExam: (id: string, answers: { exerciseId: string; transcript: string }[]) =>
+    request<ExamSubmitResult>("POST", `/api/exams/${id}/submit`, { answers }),
   dashboard: () => request<DashboardDto>("GET", "/api/dashboard"),
 };

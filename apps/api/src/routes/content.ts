@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { CEFR_ORDER } from "../lib/gamification.js";
+import { CEFR_ORDER, unlockedLevelSet } from "../lib/gamification.js";
 import { userStats } from "./auth.js";
 
 // Le contenu envoyé au client ne contient jamais les réponses attendues
@@ -30,41 +30,97 @@ function clientContent(type: string, raw: string) {
 }
 
 export async function contentRoutes(app: FastifyInstance) {
-  // Carte des unités/leçons avec état (verrouillée, débloquée, terminée).
-  app.get("/api/units", { preHandler: [app.authenticate] }, async (req) => {
+  // Parcours complet groupé par niveau CECRL, avec état de chaque leçon et de
+  // l'examen de fin de niveau (verrouillé / ouvert / terminé).
+  app.get("/api/path", { preHandler: [app.authenticate] }, async (req) => {
     const userId = req.user.sub;
-    const units = await app.prisma.unit.findMany({
-      include: {
-        lessons: {
-          orderBy: { sortOrder: "asc" },
-          include: { progress: { where: { userId } }, exercises: { select: { id: true } } },
+    const [units, exams, unlocked] = await Promise.all([
+      app.prisma.unit.findMany({
+        include: {
+          lessons: {
+            orderBy: { sortOrder: "asc" },
+            include: { progress: { where: { userId } }, exercises: { select: { id: true } } },
+          },
         },
-      },
-    });
+      }),
+      app.prisma.exam.findMany({
+        include: { exercises: { select: { id: true } }, results: { where: { userId } } },
+      }),
+      unlockedLevelSet(app.prisma, userId),
+    ]);
+
     units.sort(
       (a, b) => CEFR_ORDER.indexOf(a.cefrLevel) - CEFR_ORDER.indexOf(b.cefrLevel) || a.sortOrder - b.sortOrder
     );
+    const examByLevel = new Map(exams.map((e) => [e.cefrLevel, e]));
 
-    let previousCompleted = true; // la toute première leçon est débloquée
-    return units.map((u) => ({
-      id: u.id,
-      cefrLevel: u.cefrLevel,
-      title: u.title,
-      description: u.description,
-      lessons: u.lessons.map((l) => {
-        const done = l.progress.some((p) => p.completedAt);
-        const status = done ? "COMPLETED" : previousCompleted ? "UNLOCKED" : "LOCKED";
-        previousCompleted = done;
-        return {
-          id: l.id,
-          title: l.title,
-          xpReward: l.xpReward,
-          exerciseCount: l.exercises.length,
+    // Regroupe les unités par niveau, en conservant l'ordre CECRL.
+    const levelOrder: string[] = [];
+    const unitsByLevel = new Map<string, typeof units>();
+    for (const u of units) {
+      if (!unitsByLevel.has(u.cefrLevel)) {
+        unitsByLevel.set(u.cefrLevel, []);
+        levelOrder.push(u.cefrLevel);
+      }
+      unitsByLevel.get(u.cefrLevel)!.push(u);
+    }
+
+    return levelOrder.map((level) => {
+      const levelUnits = unitsByLevel.get(level)!;
+      const levelUnlocked = unlocked.has(level);
+
+      // Déblocage séquentiel des leçons À L'INTÉRIEUR du niveau.
+      let previousCompleted = true;
+      const outUnits = levelUnits.map((u) => ({
+        id: u.id,
+        cefrLevel: u.cefrLevel,
+        title: u.title,
+        description: u.description,
+        lessons: u.lessons.map((l) => {
+          const done = l.progress.some((p) => p.completedAt);
+          let status: "LOCKED" | "UNLOCKED" | "COMPLETED";
+          if (!levelUnlocked) status = "LOCKED";
+          else status = done ? "COMPLETED" : previousCompleted ? "UNLOCKED" : "LOCKED";
+          previousCompleted = done;
+          return {
+            id: l.id,
+            title: l.title,
+            xpReward: l.xpReward,
+            exerciseCount: l.exercises.length,
+            status,
+            bestScore: l.progress[0]?.bestScore ?? null,
+          };
+        }),
+      }));
+
+      const allLessons = levelUnits.flatMap((u) => u.lessons);
+      const allDone = allLessons.length > 0 && allLessons.every((l) => l.progress.some((p) => p.completedAt));
+
+      const exam = examByLevel.get(level);
+      let examOut = null;
+      if (exam) {
+        const res = exam.results[0];
+        const passed = res?.passed ?? false;
+        const status: "LOCKED" | "UNLOCKED" | "PASSED" = passed
+          ? "PASSED"
+          : levelUnlocked && allDone
+            ? "UNLOCKED"
+            : "LOCKED";
+        examOut = {
+          id: exam.id,
+          title: exam.title,
+          description: exam.description,
+          exerciseCount: exam.exercises.length,
+          xpReward: exam.xpReward,
+          passScore: exam.passScore,
           status,
-          bestScore: l.progress[0]?.bestScore ?? null,
+          bestScore: res?.bestScore ?? null,
+          bestOn20: res ? Math.round(res.bestScore / 5) : null,
         };
-      }),
-    }));
+      }
+
+      return { cefrLevel: level, unlocked: levelUnlocked, units: outUnits, exam: examOut };
+    });
   });
 
   app.get("/api/lessons/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
@@ -80,6 +136,33 @@ export async function contentRoutes(app: FastifyInstance) {
       xpReward: lesson.xpReward,
       unit: { title: lesson.unit.title, cefrLevel: lesson.unit.cefrLevel },
       exercises: lesson.exercises.map((e) => ({
+        id: e.id,
+        type: e.type,
+        minScore: e.minScore,
+        content: clientContent(e.type, e.content),
+      })),
+    };
+  });
+
+  // Examen de fin de niveau : liste des questions (sans les réponses).
+  app.get("/api/exams/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const userId = req.user.sub;
+    const { id } = req.params as any;
+    const exam = await app.prisma.exam.findUnique({
+      where: { id },
+      include: { exercises: { orderBy: { sortOrder: "asc" } }, results: { where: { userId } } },
+    });
+    if (!exam) return reply.code(404).send({ error: "Examen introuvable." });
+    return {
+      id: exam.id,
+      title: exam.title,
+      description: exam.description,
+      cefrLevel: exam.cefrLevel,
+      xpReward: exam.xpReward,
+      passScore: exam.passScore,
+      bestOn20: exam.results[0] ? Math.round(exam.results[0].bestScore / 5) : null,
+      passed: exam.results[0]?.passed ?? false,
+      exercises: exam.exercises.map((e) => ({
         id: e.id,
         type: e.type,
         minScore: e.minScore,
@@ -110,7 +193,7 @@ export async function contentRoutes(app: FastifyInstance) {
       })),
       history: recent.map((a) => ({
         id: a.id,
-        lessonTitle: a.exercise.lesson.title,
+        lessonTitle: a.exercise.lesson?.title ?? "Test de niveau",
         type: a.exercise.type,
         score: a.score,
         passed: a.passed,

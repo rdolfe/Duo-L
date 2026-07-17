@@ -58,6 +58,9 @@ export async function attemptRoutes(app: FastifyInstance) {
     }
     const exercise = await app.prisma.exercise.findUnique({ where: { id: exerciseId } });
     if (!exercise) return reply.code(404).send({ error: "Exercice introuvable." });
+    if (exercise.examId) {
+      return reply.code(400).send({ error: "Cet exercice fait partie d'un test de niveau." });
+    }
 
     let user = await app.prisma.user.findUniqueOrThrow({ where: { id: userId } });
     user = await refreshHearts(app.prisma, user);
@@ -188,6 +191,102 @@ export async function attemptRoutes(app: FastifyInstance) {
       xpGained: xp,
       perfect,
       bestScore,
+      newBadges,
+      stats: await userStats(app, userId),
+    };
+  });
+
+  // Test de fin de niveau : le client envoie toutes les réponses d'un coup, le
+  // serveur les note, calcule la moyenne (sur 20) et, si réussi, marque le test
+  // comme validé (ce qui débloque le niveau suivant). Les tests ne coûtent pas
+  // de cœurs.
+  app.post("/api/exams/:id/submit", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const userId = req.user.sub;
+    const { id } = req.params as any;
+    const { answers } = (req.body ?? {}) as any;
+    if (!Array.isArray(answers)) {
+      return reply.code(400).send({ error: "Réponses requises." });
+    }
+    const exam = await app.prisma.exam.findUnique({ where: { id }, include: { exercises: true } });
+    if (!exam) return reply.code(404).send({ error: "Examen introuvable." });
+    if (exam.exercises.length === 0) return reply.code(400).send({ error: "Examen vide." });
+
+    const answerMap = new Map<string, string>(
+      answers.map((a: any) => [String(a.exerciseId), String(a.transcript ?? "")])
+    );
+
+    let sum = 0;
+    const details = exam.exercises.map((ex) => {
+      const transcript = answerMap.get(ex.id) ?? "";
+      let score: number;
+      let correctAnswer: string;
+      if (ex.type === "MULTIPLE_CHOICE") {
+        const answer = expectedAnswers(ex.type, ex.content)[0];
+        score = normalizeExact(transcript) === normalizeExact(answer) ? 100 : 0;
+        correctAnswer = answer;
+      } else {
+        const r = scoreAgainstCandidates(expectedAnswers(ex.type, ex.content), transcript);
+        score = Math.max(0, r.score);
+        correctAnswer = r.matched || revealAnswer(ex.type, ex.content);
+      }
+      sum += score;
+      return { exerciseId: ex.id, type: ex.type, score, correctAnswer, yourAnswer: transcript, passed: score >= ex.minScore };
+    });
+
+    const scorePercent = Math.round(sum / exam.exercises.length);
+    const scoreOn20 = Math.round(scorePercent / 5);
+    const passed = scorePercent >= exam.passScore;
+
+    const prev = await app.prisma.examResult.findUnique({
+      where: { userId_examId: { userId, examId: id } },
+    });
+    const wasPassed = prev?.passed ?? false;
+
+    await app.prisma.examResult.upsert({
+      where: { userId_examId: { userId, examId: id } },
+      create: {
+        userId, examId: id,
+        bestScore: scorePercent,
+        passed,
+        attempts: 1,
+        completedAt: passed ? new Date() : null,
+      },
+      update: {
+        bestScore: Math.max(scorePercent, prev?.bestScore ?? 0),
+        passed: wasPassed || passed,
+        attempts: (prev?.attempts ?? 0) + 1,
+        completedAt: prev?.completedAt ?? (passed ? new Date() : null),
+      },
+    });
+
+    // XP + série uniquement à la première réussite du test.
+    let xpGained = 0;
+    if (passed && !wasPassed) {
+      xpGained = exam.xpReward;
+      const user = await app.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+      const streak = nextStreak(user);
+      await app.prisma.user.update({
+        where: { id: userId },
+        data: {
+          totalXp: user.totalXp + xpGained,
+          currentStreak: streak,
+          longestStreak: Math.max(streak, user.longestStreak),
+          lastActiveDay: todayKey(),
+        },
+      });
+      await app.prisma.xpEvent.create({ data: { userId, amount: xpGained, reason: "exam_passed" } });
+    }
+
+    const newBadges = await checkBadges(app.prisma, userId, {});
+
+    return {
+      scoreOn20,
+      scorePercent,
+      passed,
+      passScore: exam.passScore,
+      justUnlockedNext: passed && !wasPassed,
+      xpGained,
+      details,
       newBadges,
       stats: await userStats(app, userId),
     };
