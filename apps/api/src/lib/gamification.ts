@@ -1,7 +1,7 @@
 import { PrismaClient, User } from "@prisma/client";
 
 export const MAX_HEARTS = 5;
-export const HEART_REFILL_MS = 2 * 60 * 60 * 1000; // 1 cœur toutes les 2 h
+export const HEART_REFILL_MS = 7 * 1000; // 1 cœur toutes les 7 secondes
 
 // Calcule les cœurs régénérés depuis la dernière mise à jour et persiste si besoin.
 export async function refreshHearts(prisma: PrismaClient, user: User): Promise<User> {

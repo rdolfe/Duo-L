@@ -28,7 +28,7 @@ Ouvre http://localhost:5173 dans **Chrome ou Edge** (la reconnaissance vocale We
 - **Tests de fin de niveau notés sur 20** : à la fin de chaque niveau, un examen (toutes catégories mélangées) qu'il faut réussir (≥ 12/20) pour débloquer le niveau CECRL suivant.
 - Bouton « 💡 Je ne sais pas — voir la réponse » sur chaque exercice de leçon (coûte 1 cœur ; les tests ne coûtent pas de cœurs).
 - Scoring : alignement mot à mot (Needleman-Wunsch) + distance de Levenshtein, calculé côté serveur ; comparaison exacte pour les QCM. Les nombres sont normalisés : « 1 » et « one », « 21 » et « twenty-one » sont équivalents.
-- Gamification : XP (journal `XpEvent`), séries quotidiennes, 5 vies (régénération : 1 cœur / 2 h), 9 badges.
+- Gamification : XP (journal `XpEvent`), séries quotidiennes, 5 vies (régénération : 1 cœur / 7 s), 9 badges.
 - Parcours A1 → C2 : 15 unités, 29 leçons, 6 tests de niveau, ~300 exercices. Les exercices sont regroupés par type au sein de chaque leçon ; déblocage séquentiel des leçons, puis des niveaux via les tests.
 - Interface responsive (mobile inclus) — voir [DEPLOY.md](DEPLOY.md) pour la mise en ligne.
 
