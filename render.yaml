@@ -3,7 +3,7 @@ services:
     name: duospeak
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build && npm run db:push:prod -w apps/api && npm run db:seed -w apps/api
+    buildCommand: npm install --include=dev && npm run build && npm run db:push:prod -w apps/api && npm run db:seed -w apps/api
     startCommand: npm start
     envVars:
       - key: NODE_ENV
