@@ -25,6 +25,9 @@ export default function Dashboard({
 }) {
   const [levels, setLevels] = useState<LevelDto[] | null>(null);
   const [dash, setDash] = useState<DashboardDto | null>(null);
+  const [code, setCode] = useState("");
+  const [unlockMsg, setUnlockMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [unlocking, setUnlocking] = useState(false);
 
   useEffect(() => {
     api.path().then(setLevels);
@@ -32,6 +35,25 @@ export default function Dashboard({
   }, []);
 
   const s = dash?.stats ?? stats;
+
+  const submitCode = async () => {
+    const value = code.trim();
+    if (!value || unlocking) return;
+    setUnlocking(true);
+    setUnlockMsg(null);
+    try {
+      const r = await api.unlock(value);
+      setCode("");
+      setUnlockMsg({ ok: true, text: `Niveau ${r.unlockedLevel} débloqué ! 🎉` });
+      const [lv, d] = await Promise.all([api.path(), api.dashboard()]);
+      setLevels(lv);
+      setDash(d);
+    } catch (e: any) {
+      setUnlockMsg({ ok: false, text: e.message ?? "Code invalide." });
+    } finally {
+      setUnlocking(false);
+    }
+  };
 
   return (
     <div className="shell">
@@ -162,6 +184,30 @@ export default function Dashboard({
             <section className="panel">
               <h2>Record</h2>
               <p className="muted">Plus longue série : 🔥 {s.longestStreak} jour{s.longestStreak > 1 ? "s" : ""}</p>
+            </section>
+
+            <section className="panel unlock-panel">
+              <h2>🔓 Débloquer un niveau</h2>
+              <p className="muted">Entre un code de déblocage pour ouvrir un niveau.</p>
+              <div className="unlock-row">
+                <input
+                  type="text"
+                  placeholder="Ton code…"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && submitCode()}
+                  disabled={unlocking}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                />
+                <button className="btn btn-primary" onClick={submitCode} disabled={unlocking || !code.trim()}>
+                  {unlocking ? "…" : "Valider"}
+                </button>
+              </div>
+              {unlockMsg && (
+                <p className={unlockMsg.ok ? "unlock-ok" : "unlock-err"}>{unlockMsg.text}</p>
+              )}
             </section>
           </aside>
         </div>

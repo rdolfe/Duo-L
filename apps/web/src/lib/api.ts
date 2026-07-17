@@ -189,4 +189,6 @@ export const api = {
   submitExam: (id: string, answers: { exerciseId: string; transcript: string }[]) =>
     request<ExamSubmitResult>("POST", `/api/exams/${id}/submit`, { answers }),
   dashboard: () => request<DashboardDto>("GET", "/api/dashboard"),
+  unlock: (code: string) =>
+    request<{ unlockedLevel: string; stats: UserStats }>("POST", "/api/unlock", { code }),
 };

@@ -430,6 +430,23 @@ p { margin: 0 0 8px; }
 .rev-body .muted { margin: 4px 0; }
 .rev-body .correct-answer { margin: 6px 0 0; }
 
+/* ---------- Déblocage par code ---------- */
+.unlock-row { display: flex; gap: 8px; margin-top: 10px; }
+.unlock-panel input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: white;
+  color: var(--text);
+}
+.unlock-panel input:focus { outline: none; border-color: var(--blue); }
+.unlock-panel .btn { padding: 12px 18px; }
+.unlock-ok { color: var(--green-dark); font-weight: 700; margin: 10px 0 0; }
+.unlock-err { color: var(--red); font-weight: 700; margin: 10px 0 0; }
+
 /* ---------- Mobile ---------- */
 @media (max-width: 520px) {
   .shell { padding: 0 12px 40px; }

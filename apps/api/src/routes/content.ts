@@ -171,6 +171,47 @@ export async function contentRoutes(app: FastifyInstance) {
     };
   });
 
+  // Code de déblocage : « jailelevelA1 », « jailelevelB2 », etc.
+  // Entrer le code d'un niveau marque comme réussis les examens de tous les
+  // niveaux jusqu'à celui-ci (inclus), ce qui débloque ce niveau (et le suivant).
+  const UNLOCK_CODES: Record<string, string> = Object.fromEntries(
+    CEFR_ORDER.map((lvl) => [`jailelevel${lvl}`.toLowerCase(), lvl])
+  );
+  app.post("/api/unlock", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const userId = req.user.sub;
+    const { code } = (req.body ?? {}) as any;
+    const level = UNLOCK_CODES[String(code ?? "").trim().toLowerCase()];
+    if (!level) return reply.code(400).send({ error: "Code invalide." });
+
+    const idx = CEFR_ORDER.indexOf(level);
+    const levels = CEFR_ORDER.slice(0, idx + 1);
+    const exams = await app.prisma.exam.findMany({ where: { cefrLevel: { in: levels } } });
+    if (exams.length === 0) {
+      return reply.code(409).send({ error: "Les tests de niveau ne sont pas encore chargés côté serveur." });
+    }
+    for (const exam of exams) {
+      const prev = await app.prisma.examResult.findUnique({
+        where: { userId_examId: { userId, examId: exam.id } },
+      });
+      await app.prisma.examResult.upsert({
+        where: { userId_examId: { userId, examId: exam.id } },
+        create: {
+          userId, examId: exam.id,
+          bestScore: Math.max(prev?.bestScore ?? 0, exam.passScore),
+          passed: true,
+          attempts: prev?.attempts ?? 0,
+          completedAt: new Date(),
+        },
+        update: {
+          passed: true,
+          bestScore: Math.max(prev?.bestScore ?? 0, exam.passScore),
+          completedAt: prev?.completedAt ?? new Date(),
+        },
+      });
+    }
+    return { unlockedLevel: level, stats: await userStats(app, userId) };
+  });
+
   app.get("/api/dashboard", { preHandler: [app.authenticate] }, async (req) => {
     const userId = req.user.sub;
     const [stats, badges, owned, recent] = await Promise.all([
