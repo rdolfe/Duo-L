@@ -179,7 +179,7 @@ export default function LessonPlayer({
         <div className="panel out-of-hearts">
           <div className="big-emoji">💔</div>
           <h2>Plus de vies !</h2>
-          <p>Tes cœurs se régénèrent tout seuls (1 toutes les 7 secondes). Patiente quelques secondes !</p>
+          <p>Tu as perdu toutes tes vies ! Patiente 7 secondes et elles reviennent toutes. 💪</p>
           <button className="btn btn-primary" onClick={onQuit}>Retour au tableau de bord</button>
         </div>
       </div>

@@ -1,21 +1,19 @@
 import { PrismaClient, User } from "@prisma/client";
 
 export const MAX_HEARTS = 5;
-export const HEART_REFILL_MS = 7 * 1000; // 1 cœur toutes les 7 secondes
+export const HEART_REFILL_MS = 7 * 1000; // délai après avoir perdu TOUTES ses vies
 
-// Calcule les cœurs régénérés depuis la dernière mise à jour et persiste si besoin.
+// On ne régénère les vies QUE lorsqu'elles sont toutes perdues (0). Le compte à
+// rebours démarre à l'instant où la dernière vie est perdue (heartsUpdatedAt) ;
+// une fois le délai écoulé, on refait le plein d'un coup. Tant qu'il reste au
+// moins une vie, rien ne se régénère (sinon on ne « sent » jamais l'attente).
 export async function refreshHearts(prisma: PrismaClient, user: User): Promise<User> {
-  if (user.hearts >= MAX_HEARTS) return user;
+  if (user.hearts > 0) return user;
   const elapsed = Date.now() - user.heartsUpdatedAt.getTime();
-  const gained = Math.floor(elapsed / HEART_REFILL_MS);
-  if (gained <= 0) return user;
-  const hearts = Math.min(MAX_HEARTS, user.hearts + gained);
+  if (elapsed < HEART_REFILL_MS) return user;
   return prisma.user.update({
     where: { id: user.id },
-    data: {
-      hearts,
-      heartsUpdatedAt: hearts >= MAX_HEARTS ? new Date() : new Date(user.heartsUpdatedAt.getTime() + gained * HEART_REFILL_MS),
-    },
+    data: { hearts: MAX_HEARTS, heartsUpdatedAt: new Date() },
   });
 }
 

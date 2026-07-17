@@ -84,8 +84,8 @@ export async function attemptRoutes(app: FastifyInstance) {
         where: { id: userId },
         data: {
           hearts: user.hearts - 1,
-          // démarre le chrono de régénération si on quitte le max
-          heartsUpdatedAt: user.hearts === 5 ? new Date() : user.heartsUpdatedAt,
+          // démarre le compte à rebours seulement quand on perd la dernière vie (1 → 0)
+          heartsUpdatedAt: user.hearts === 1 ? new Date() : user.heartsUpdatedAt,
         },
       });
     }
@@ -125,7 +125,8 @@ export async function attemptRoutes(app: FastifyInstance) {
       where: { id: userId },
       data: {
         hearts: user.hearts - 1,
-        heartsUpdatedAt: user.hearts === 5 ? new Date() : user.heartsUpdatedAt,
+        // démarre le compte à rebours seulement quand on perd la dernière vie (1 → 0)
+        heartsUpdatedAt: user.hearts === 1 ? new Date() : user.heartsUpdatedAt,
       },
     });
 
