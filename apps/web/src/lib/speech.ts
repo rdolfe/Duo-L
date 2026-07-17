@@ -9,6 +9,27 @@ export type RecognitionHandle = {
   stop: () => void;
 };
 
+// Filet de sécurité contre le bug Android où le moteur duplique la phrase
+// entière ("how are you how are you"). Si le texte est exactement deux moitiés
+// identiques (jusqu'à 3 répétitions), on n'en garde qu'une.
+export function dedupeRepeat(text: string): string {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const n = words.length;
+  for (const parts of [2, 3]) {
+    if (n >= parts && n % parts === 0) {
+      const size = n / parts;
+      const segs: string[] = [];
+      for (let p = 0; p < parts; p++) {
+        segs.push(words.slice(p * size, (p + 1) * size).join(" ").toLowerCase());
+      }
+      if (segs.every((s) => s === segs[0])) {
+        return words.slice(0, size).join(" ");
+      }
+    }
+  }
+  return words.join(" ");
+}
+
 export function startRecognition(callbacks: {
   onInterim?: (text: string) => void;
   onFinal: (text: string) => void;
@@ -22,7 +43,10 @@ export function startRecognition(callbacks: {
   const rec = new Ctor();
   rec.lang = "en-US";
   rec.interimResults = true;
-  rec.continuous = true;
+  // continuous = false : sur Android Chrome, le mode continu duplique la phrase.
+  // Une phrase à la fois est bien plus fiable ; le moteur s'arrête tout seul
+  // après un silence, ce qui déclenche onend puis l'envoi.
+  rec.continuous = false;
   rec.maxAlternatives = 1;
 
   let finalText = "";
@@ -53,7 +77,7 @@ export function startRecognition(callbacks: {
   rec.onend = () => {
     if (!stopped) {
       stopped = true;
-      callbacks.onFinal(finalText.trim());
+      callbacks.onFinal(dedupeRepeat(finalText));
     }
   };
   rec.start();
@@ -66,7 +90,7 @@ export function startRecognition(callbacks: {
         rec.stop();
       } catch {}
       // onend ne sera plus traité (stopped=true), on émet le final nous-mêmes
-      setTimeout(() => callbacks.onFinal(finalText.trim()), 300);
+      setTimeout(() => callbacks.onFinal(dedupeRepeat(finalText)), 300);
     },
   };
 }
