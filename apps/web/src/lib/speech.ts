@@ -29,13 +29,16 @@ export function startRecognition(callbacks: {
   let stopped = false;
 
   rec.onresult = (event: any) => {
-    let interim = "";
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const r = event.results[i];
-      if (r.isFinal) finalText += r[0].transcript + " ";
-      else interim += r[0].transcript;
+    // On reconstruit la phrase entière à partir de TOUS les segments à chaque
+    // événement, au lieu d'accumuler. Sur certains Android, le mode continu
+    // réémet les segments déjà finalisés : accumuler doublait les mots
+    // ("hello hello"). Reconstruire depuis l'index 0 élimine ce doublage.
+    let full = "";
+    for (let i = 0; i < event.results.length; i++) {
+      full += event.results[i][0].transcript + " ";
     }
-    callbacks.onInterim?.((finalText + interim).trim());
+    finalText = full.trim();
+    callbacks.onInterim?.(finalText);
   };
   rec.onerror = (event: any) => {
     if (stopped) return;
