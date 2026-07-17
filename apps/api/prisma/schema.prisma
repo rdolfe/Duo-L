@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  passwordHash    String
+  displayName     String
+  createdAt       DateTime @default(now())
+
+  totalXp         Int      @default(0)
+  hearts          Int      @default(5)
+  heartsUpdatedAt DateTime @default(now())
+  currentStreak   Int      @default(0)
+  longestStreak   Int      @default(0)
+  lastActiveDay   String?
+
+  progress LessonProgress[]
+  attempts ExerciseAttempt[]
+  badges   UserBadge[]
+  xpEvents XpEvent[]
+}
+
+model Unit {
+  id          String   @id @default(cuid())
+  cefrLevel   String
+  title       String
+  description String
+  sortOrder   Int
+  lessons     Lesson[]
+
+  @@unique([cefrLevel, sortOrder])
+}
+
+model Lesson {
+  id        String     @id @default(cuid())
+  unitId    String
+  unit      Unit       @relation(fields: [unitId], references: [id])
+  title     String
+  sortOrder Int
+  xpReward  Int        @default(15)
+  exercises Exercise[]
+  progress  LessonProgress[]
+
+  @@unique([unitId, sortOrder])
+}
+
+model Exercise {
+  id        String @id @default(cuid())
+  lessonId  String
+  lesson    Lesson @relation(fields: [lessonId], references: [id])
+  type      String
+  sortOrder Int
+  content   String
+  minScore  Int    @default(55)
+  attempts  ExerciseAttempt[]
+}
+
+model LessonProgress {
+  userId      String
+  lessonId    String
+  user        User      @relation(fields: [userId], references: [id])
+  lesson      Lesson    @relation(fields: [lessonId], references: [id])
+  bestScore   Int?
+  completedAt DateTime?
+
+  @@id([userId, lessonId])
+}
+
+model ExerciseAttempt {
+  id         String   @id @default(cuid())
+  userId     String
+  exerciseId String
+  user       User     @relation(fields: [userId], references: [id])
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  transcript String
+  score      Int
+  wordScores String?
+  passed     Boolean
+  createdAt  DateTime @default(now())
+}
+
+model XpEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model Badge {
+  id            String @id @default(cuid())
+  slug          String @unique
+  titleFr       String
+  descriptionFr String
+  icon          String
+  criteriaType  String
+  criteriaValue Int
+  users         UserBadge[]
+}
+
+model UserBadge {
+  userId   String
+  badgeId  String
+  user     User     @relation(fields: [userId], references: [id])
+  badge    Badge    @relation(fields: [badgeId], references: [id])
+  earnedAt DateTime @default(now())
+
+  @@id([userId, badgeId])
+}

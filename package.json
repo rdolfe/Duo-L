@@ -1,0 +1,14 @@
+{
+  "name": "duo-speak",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w apps/api",
+    "dev:web": "npm run dev -w apps/web",
+    "db:setup": "npm run db:push -w apps/api && npm run db:seed -w apps/api",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/api"
+  }
+}
