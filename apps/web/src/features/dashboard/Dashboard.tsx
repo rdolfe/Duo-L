@@ -14,16 +14,18 @@ const TYPE_LABELS: Record<string, string> = {
 
 export default function Dashboard({
   stats,
+  focusLevel,
   onLogout,
   onStartLesson,
   onStartExam,
   onOpenCourse,
 }: {
   stats: UserStats;
+  focusLevel?: string | null;
   onLogout: () => void;
-  onStartLesson: (lessonId: string) => void;
-  onStartExam: (examId: string) => void;
-  onOpenCourse: (courseId: string) => void;
+  onStartLesson: (lessonId: string, level: string) => void;
+  onStartExam: (examId: string, level: string) => void;
+  onOpenCourse: (courseId: string, level: string) => void;
 }) {
   const [levels, setLevels] = useState<LevelDto[] | null>(null);
   const [dash, setDash] = useState<DashboardDto | null>(null);
@@ -35,6 +37,14 @@ export default function Dashboard({
     api.path().then(setLevels);
     api.dashboard().then(setDash);
   }, []);
+
+  // Au retour d'une leçon / d'un test / d'un cours : re-scrolle sur le niveau
+  // d'où l'utilisateur était parti (dès que le parcours est chargé).
+  useEffect(() => {
+    if (levels && focusLevel) {
+      document.getElementById(`level-${focusLevel}`)?.scrollIntoView({ block: "start" });
+    }
+  }, [levels, focusLevel]);
 
   const s = dash?.stats ?? stats;
 
@@ -85,7 +95,11 @@ export default function Dashboard({
             <h2>Ton parcours</h2>
             {!levels && <p>Chargement du parcours…</p>}
             {levels?.map((level) => (
-              <div key={level.cefrLevel} className={`level-block ${level.unlocked ? "" : "level-locked"}`}>
+              <div
+                key={level.cefrLevel}
+                id={`level-${level.cefrLevel}`}
+                className={`level-block ${level.unlocked ? "" : "level-locked"}`}
+              >
                 <div className="level-header">
                   <span className="level-chip big">{level.cefrLevel}</span>
                   {!level.unlocked && <span className="lock-note">🔒 Réussis le test du niveau précédent</span>}
@@ -97,7 +111,7 @@ export default function Dashboard({
                       <button
                         key={c.id}
                         className="course-card"
-                        onClick={() => onOpenCourse(c.id)}
+                        onClick={() => onOpenCourse(c.id, level.cefrLevel)}
                         title={c.intro}
                       >
                         <span className="course-emoji">{c.emoji}</span>
@@ -124,7 +138,7 @@ export default function Dashboard({
                           key={l.id}
                           className={`lesson-node ${l.status.toLowerCase()}`}
                           disabled={l.status === "LOCKED"}
-                          onClick={() => onStartLesson(l.id)}
+                          onClick={() => onStartLesson(l.id, level.cefrLevel)}
                           title={
                             l.status === "LOCKED"
                               ? "Termine la leçon précédente pour débloquer"
@@ -162,7 +176,7 @@ export default function Dashboard({
                     {level.exam.status !== "LOCKED" && (
                       <button
                         className={`btn ${level.exam.status === "PASSED" ? "btn-ghost" : "btn-primary"}`}
-                        onClick={() => onStartExam(level.exam!.id)}
+                        onClick={() => onStartExam(level.exam!.id, level.cefrLevel)}
                       >
                         {level.exam.status === "PASSED" ? "Repasser le test" : "Passer le test 🎓"}
                       </button>

@@ -21,6 +21,9 @@ type View =
 export default function App() {
   const [view, setView] = useState<View>({ name: "loading" });
   const [stats, setStats] = useState<UserStats | null>(null);
+  // Niveau CECRL d'où l'utilisateur est parti (leçon, test, cours) : au retour
+  // sur le parcours, on re-scrolle directement dessus.
+  const [focusLevel, setFocusLevel] = useState<string | null>(null);
 
   useEffect(() => {
     if (!getToken()) {
@@ -69,10 +72,20 @@ export default function App() {
       return (
         <Dashboard
           stats={stats!}
+          focusLevel={focusLevel}
           onLogout={logout}
-          onStartLesson={(lessonId) => setView({ name: "lesson", lessonId })}
-          onStartExam={(examId) => setView({ name: "exam", examId })}
-          onOpenCourse={(courseId) => setView({ name: "course", courseId })}
+          onStartLesson={(lessonId, level) => {
+            setFocusLevel(level);
+            setView({ name: "lesson", lessonId });
+          }}
+          onStartExam={(examId, level) => {
+            setFocusLevel(level);
+            setView({ name: "exam", examId });
+          }}
+          onOpenCourse={(courseId, level) => {
+            setFocusLevel(level);
+            setView({ name: "course", courseId });
+          }}
         />
       );
     case "lesson":
