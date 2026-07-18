@@ -15,9 +15,16 @@ function expectedAnswers(type: string, raw: string): string[] {
     case "FILL_BLANK": return [c.answer, ...(c.alternatives ?? [])];
     case "WRITE_TRANSLATION": return c.accepted;
     case "LISTEN_TYPE": return [c.textEn];
+    case "WORD_ORDER": return [c.textEn];
+    case "CORRECT_MISTAKE": return c.accepted;
     default: return [];
   }
 }
+
+// Types à comparaison exacte : la réponse est bonne ou mauvaise, pas de score
+// partiel (sinon recopier la phrase fautive d'un « Corrige la faute »
+// passerait grâce à la similarité).
+const EXACT_TYPES = ["MULTIPLE_CHOICE", "WORD_ORDER", "CORRECT_MISTAKE"];
 
 // Réponse « modèle » à révéler quand l'utilisateur ne sait pas.
 function revealAnswer(type: string, raw: string): string {
@@ -31,6 +38,8 @@ function revealAnswer(type: string, raw: string): string {
     case "FILL_BLANK": return c.answer;
     case "WRITE_TRANSLATION": return c.accepted[0];
     case "LISTEN_TYPE": return c.textEn;
+    case "WORD_ORDER": return c.textEn;
+    case "CORRECT_MISTAKE": return c.accepted[0];
     default: return "";
   }
 }
@@ -68,12 +77,13 @@ export async function attemptRoutes(app: FastifyInstance) {
       return reply.code(403).send({ error: "Plus de vies ! Reviens plus tard." });
     }
 
-    // QCM : comparaison exacte (une option est bonne ou mauvaise, pas de score partiel).
+    // QCM / remise en ordre / correction : comparaison exacte (bonne ou
+    // mauvaise, pas de score partiel). Le reste : score de similarité.
     let result;
-    if (exercise.type === "MULTIPLE_CHOICE") {
-      const answer = expectedAnswers(exercise.type, exercise.content)[0];
-      const correct = normalizeExact(transcript) === normalizeExact(answer);
-      result = { score: correct ? 100 : 0, wordScores: [], matched: answer };
+    if (EXACT_TYPES.includes(exercise.type)) {
+      const candidates = expectedAnswers(exercise.type, exercise.content);
+      const correct = candidates.some((a) => normalizeExact(transcript) === normalizeExact(a));
+      result = { score: correct ? 100 : 0, wordScores: [], matched: candidates[0] };
     } else {
       result = scoreAgainstCandidates(expectedAnswers(exercise.type, exercise.content), transcript);
     }
@@ -240,10 +250,10 @@ export async function attemptRoutes(app: FastifyInstance) {
       const transcript = answerMap.get(ex.id) ?? "";
       let score: number;
       let correctAnswer: string;
-      if (ex.type === "MULTIPLE_CHOICE") {
-        const answer = expectedAnswers(ex.type, ex.content)[0];
-        score = normalizeExact(transcript) === normalizeExact(answer) ? 100 : 0;
-        correctAnswer = answer;
+      if (EXACT_TYPES.includes(ex.type)) {
+        const candidates = expectedAnswers(ex.type, ex.content);
+        score = candidates.some((a) => normalizeExact(transcript) === normalizeExact(a)) ? 100 : 0;
+        correctAnswer = candidates[0];
       } else {
         const r = scoreAgainstCandidates(expectedAnswers(ex.type, ex.content), transcript);
         score = Math.max(0, r.score);

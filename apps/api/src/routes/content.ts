@@ -39,6 +39,17 @@ function clientContent(type: string, raw: string) {
     case "LISTEN_TYPE":
       // textEn est nécessaire au client pour la synthèse vocale ; l'UI ne l'affiche pas.
       return { textEn: c.textEn };
+    case "WORD_ORDER": {
+      // On envoie les mots MÉLANGÉS, jamais la phrase (c'est la réponse !).
+      const words = (c.textEn as string).replace(/[.,!?;]/g, "").split(/\s+/).filter(Boolean);
+      let mixed = shuffled(words);
+      if (mixed.join(" ") === words.join(" ") && mixed.length > 1) {
+        mixed = [...mixed.slice(1), mixed[0]];
+      }
+      return { words: mixed, textFr: c.textFr };
+    }
+    case "CORRECT_MISTAKE":
+      return { wrong: c.wrong, hintFr: c.hintFr };
     default:
       return {};
   }

@@ -10,6 +10,8 @@ const TYPE_LABELS: Record<string, string> = {
   FILL_BLANK: "Phrase à trou",
   WRITE_TRANSLATION: "Traduction écrite",
   LISTEN_TYPE: "Dictée",
+  WORD_ORDER: "Remets dans l'ordre",
+  CORRECT_MISTAKE: "Corrige la faute",
 };
 
 export default function Dashboard({

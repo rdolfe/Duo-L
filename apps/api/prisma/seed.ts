@@ -11,7 +11,9 @@ type Ex =
   | { type: "MULTIPLE_CHOICE"; prompt: string; options: string[]; answer: string; hintFr?: string }
   | { type: "FILL_BLANK"; sentence: string; answer: string; hintFr?: string; alternatives?: string[] }
   | { type: "WRITE_TRANSLATION"; textFr: string; accepted: string[] }
-  | { type: "LISTEN_TYPE"; textEn: string };
+  | { type: "LISTEN_TYPE"; textEn: string }
+  | { type: "WORD_ORDER"; textEn: string; textFr?: string }
+  | { type: "CORRECT_MISTAKE"; wrong: string; accepted: string[]; hintFr?: string };
 
 type LessonDef = { title: string; xp?: number; exercises: Ex[] };
 type UnitDef = { cefrLevel: string; title: string; description: string; lessons: LessonDef[] };
@@ -46,6 +48,10 @@ const FB = (sentence: string, answer: string, hintFr?: string, ...alternatives: 
 });
 const WT = (textFr: string, ...accepted: string[]): Ex => ({ type: "WRITE_TRANSLATION", textFr, accepted });
 const LT = (textEn: string): Ex => ({ type: "LISTEN_TYPE", textEn });
+const WO = (textEn: string, textFr?: string): Ex => ({ type: "WORD_ORDER", textEn, textFr });
+const CM = (wrong: string, hintFr: string | undefined, ...accepted: string[]): Ex => ({
+  type: "CORRECT_MISTAKE", wrong, accepted, hintFr,
+});
 
 // Ordre pédagogique : on regroupe les exercices par type à l'intérieur de chaque
 // leçon (d'abord l'oral, puis l'écrit), pour que le joueur enchaîne les mêmes
@@ -57,9 +63,11 @@ const TYPE_ORDER: Record<Ex["type"], number> = {
   ROLEPLAY: 3,
   READ_ALOUD: 4,
   MULTIPLE_CHOICE: 5,
-  FILL_BLANK: 6,
-  WRITE_TRANSLATION: 7,
-  LISTEN_TYPE: 8,
+  WORD_ORDER: 6,
+  FILL_BLANK: 7,
+  CORRECT_MISTAKE: 8,
+  WRITE_TRANSLATION: 9,
+  LISTEN_TYPE: 10,
 };
 const byType = (exercises: Ex[]): Ex[] =>
   exercises
@@ -1269,6 +1277,133 @@ const GEN_IRREG: [string, string, string[]][] = [
 lessonOf("Grammaire en action", "Le passé simple").exercises.push(
   ...GEN_IRREG.map(([base, past, wrong]) => MC(`Le passé de « ${base} » est :`, [past, ...wrong], past)),
 );
+
+// « Remets dans l'ordre » : phrases à reconstruire, réparties dans les leçons
+// existantes ([unité, leçon, [phrase EN, contexte FR][]]).
+const GEN_WO: [string, string, [string, string][]][] = [
+  ["Les salutations", "Dire bonjour", [
+    ["Good morning, how are you?", "Bonjour, comment vas-tu ?"],
+    ["Nice to meet you.", "Enchanté."],
+    ["I am fine, thank you.", "Je vais bien, merci."],
+  ]],
+  ["La vie quotidienne", "Au café", [
+    ["I would like a coffee, please.", "Je voudrais un café, s'il vous plaît."],
+    ["Can I have some water, please?", "Puis-je avoir de l'eau, s'il vous plaît ?"],
+    ["How much is it?", "Combien ça coûte ?"],
+  ]],
+  ["Se déplacer", "Demander son chemin", [
+    ["Where is the train station?", "Où est la gare ?"],
+    ["Turn left at the corner.", "Tournez à gauche au coin."],
+    ["The museum is next to the bank.", "Le musée est à côté de la banque."],
+  ]],
+  ["Voyager", "À l'hôtel", [
+    ["I have a reservation for two nights.", "J'ai une réservation pour deux nuits."],
+    ["What time is breakfast served?", "À quelle heure sert-on le petit-déjeuner ?"],
+  ]],
+  ["Sortir et acheter", "Au restaurant", [
+    ["A table for two, please.", "Une table pour deux, s'il vous plaît."],
+    ["Could we have the bill, please?", "Pourrions-nous avoir l'addition ?"],
+  ]],
+  ["Grammaire en action", "Le présent simple", [
+    ["She goes to work every day.", "Elle va au travail tous les jours."],
+    ["He drinks coffee every morning.", "Il boit un café tous les matins."],
+  ]],
+  ["Vie sociale", "Donner son opinion", [
+    ["I see your point, but I disagree.", "Je vois ce que tu veux dire, mais je ne suis pas d'accord."],
+    ["In my opinion, the book is better.", "À mon avis, le livre est meilleur."],
+  ]],
+  ["Le monde du travail", "Un entretien d'embauche", [
+    ["I have three years of experience.", "J'ai trois ans d'expérience."],
+    ["I work well under pressure.", "Je travaille bien sous pression."],
+  ]],
+  ["Débats et idées", "Exprimer un désaccord", [
+    ["I'm afraid I have to disagree with you.", "Je crains de ne pas être d'accord avec vous."],
+    ["It is not as simple as it seems.", "Ce n'est pas aussi simple que ça en a l'air."],
+  ]],
+  ["Précision et style", "Grammaire avancée", [
+    ["If I were rich, I would travel the world.", "Si j'étais riche, je voyagerais partout."],
+    ["Had I known, I would have come.", "Si j'avais su, je serais venu."],
+  ]],
+  ["Nuances et style", "L'ironie et l'humour", [
+    ["Well, that could have gone better.", "Eh bien, ça aurait pu mieux se passer."],
+  ]],
+  ["Nuances et style", "Diplomatie et registres", [
+    ["I wonder if you might reconsider your position.", "Je me demande si vous pourriez reconsidérer votre position."],
+  ]],
+  ["Éloquence", "L'art du discours", [
+    ["Ask not what your country can do for you.", "Ne demandez pas ce que votre pays peut faire pour vous."],
+  ]],
+  ["Éloquence", "Débattre comme un maître", [
+    ["The burden of proof lies with you.", "La charge de la preuve vous incombe."],
+  ]],
+];
+for (const [unit, lesson, items] of GEN_WO) {
+  lessonOf(unit, lesson).exercises.push(...items.map(([en, fr]) => WO(en, fr)));
+}
+
+// « Corrige la faute » : une leçon dédiée par niveau, ciblée sur les erreurs
+// typiques des francophones. La réponse doit être la phrase corrigée exacte.
+const CM_LESSONS: [string, LessonDef][] = [
+  ["Grammaire en action", {
+    title: "Corrige la faute",
+    exercises: [
+      CM("She don't like tea.", "3e personne du singulier", "she doesn't like tea"),
+      CM("I have 20 years old.", "l'âge se dit avec be", "i am twenty years old", "i am 20 years old"),
+      CM("He go to school every day.", undefined, "he goes to school every day"),
+      CM("They was at home yesterday.", undefined, "they were at home yesterday"),
+      CM("I didn't went to the party.", "après didn't : base verbale", "i didn't go to the party", "i did not go to the party"),
+      CM("She can sings very well.", "après can : base verbale", "she can sing very well"),
+      CM("Do she speak English?", undefined, "does she speak english"),
+      CM("I am agree with you.", "agree est un verbe", "i agree with you"),
+      CM("He doesn't likes coffee.", undefined, "he doesn't like coffee", "he does not like coffee"),
+    ],
+  }],
+  ["Compréhension et expression", {
+    title: "Corrige la faute",
+    exercises: [
+      CM("I am living here since 2019.", "depuis → present perfect", "i have lived here since 2019", "i have been living here since 2019"),
+      CM("I look forward to hear from you.", "to + -ing ici", "i look forward to hearing from you"),
+      CM("She said me the truth.", "say vs tell", "she told me the truth"),
+      CM("I have seen him yesterday.", "yesterday → prétérit", "i saw him yesterday"),
+      CM("It depends of the weather.", "la bonne préposition", "it depends on the weather"),
+      CM("I am boring in this class.", "boring = ennuyeux, bored = qui s'ennuie", "i am bored in this class"),
+      CM("We discussed about the project.", "discuss est transitif direct", "we discussed the project"),
+      CM("I want that you come.", "want + infinitif", "i want you to come"),
+      CM("He is married with a doctor.", "la bonne préposition", "he is married to a doctor"),
+    ],
+  }],
+  ["Précision et style", {
+    title: "Corrige la faute",
+    exercises: [
+      CM("If I would have known, I would have come.", "pas de would après if", "if i had known i would have come"),
+      CM("Despite of the rain, we went out.", "despite s'emploie seul", "despite the rain we went out", "in spite of the rain we went out"),
+      CM("The informations are useful.", "information est indénombrable", "the information is useful"),
+      CM("I wish I was knowing the answer.", "wish + prétérit simple", "i wish i knew the answer"),
+      CM("It's worth to try.", "worth + -ing", "it's worth trying", "it is worth trying"),
+      CM("I am used to get up early.", "be used to + -ing", "i am used to getting up early"),
+      CM("She has been working here since three years.", "durée → for", "she has been working here for three years"),
+      CM("He suggested me to leave.", "suggest ne prend pas d'objet + infinitif", "he suggested that i leave", "he suggested leaving"),
+    ],
+  }],
+  ["Finesse lexicale", {
+    title: "Corrige la faute",
+    exercises: [
+      CM("The amount of people was impressive.", "dénombrable → number", "the number of people was impressive"),
+      CM("Less people came than expected.", "dénombrable → fewer", "fewer people came than expected"),
+      CM("Me and him went to the meeting.", "pronoms sujets", "he and i went to the meeting"),
+      CM("Between you and I, this plan is doomed.", "après une préposition : me", "between you and me this plan is doomed"),
+      CM("This is the most unique opportunity.", "unique ne se gradue pas", "this is a unique opportunity"),
+      CM("I could care less about the rumours.", "l'expression correcte est négative", "i couldn't care less about the rumours", "i could not care less about the rumours"),
+      CM("The criteria is clear.", "criteria est un pluriel", "the criteria are clear", "the criterion is clear"),
+      CM("The datas support this conclusion.", "data ne prend pas de s", "the data support this conclusion", "the data supports this conclusion"),
+    ],
+  }],
+];
+for (const [unitTitle, lessonDef] of CM_LESSONS) {
+  const unit = UNITS.find((u) => u.title === unitTitle);
+  if (!unit) throw new Error(`Unité introuvable : ${unitTitle}`);
+  unit.lessons.push(lessonDef);
+}
 
 // for / since (B2) : le duo « depuis » sous toutes ses coutures.
 const GEN_FOR_SINCE: [string, "for" | "since"][] = [

@@ -492,6 +492,40 @@ p { margin: 0 0 8px; }
   line-height: 1.5;
 }
 
+/* ---------- Remets dans l'ordre & Corrige la faute ---------- */
+.wo-zone { max-width: 520px; margin: 0 auto 12px; }
+.wo-built {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 10px;
+  margin-bottom: 14px;
+  background: var(--card);
+}
+.wo-built.empty { color: var(--muted); }
+.wo-bank { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.wo-chip {
+  border: 2px solid var(--border);
+  border-bottom-width: 4px;
+  border-radius: 12px;
+  background: white;
+  padding: 8px 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.06s, border-color 0.15s, opacity 0.15s;
+}
+.wo-chip:hover:not(:disabled) { border-color: var(--blue); }
+.wo-chip:active { transform: translateY(2px); }
+.wo-chip:disabled { opacity: 0.25; cursor: default; }
+.wo-chip.placed { border-color: var(--blue); background: #eaf7ff; }
+.wrong-sentence { color: var(--red); }
+
 /* ---------- Pop-up de notation ---------- */
 .rating-overlay {
   position: fixed;

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, AttemptResult, CompleteResult, ExerciseType, LessonDto } from "../../lib/api";
 import { speechRecognitionSupported, startRecognition, RecognitionHandle } from "../../lib/speech";
 import ExercisePrompt from "./ExercisePrompt";
+import WordOrderInput from "./WordOrderInput";
 
 const TYPE_TITLES: Record<ExerciseType, string> = {
   LISTEN_REPEAT: "Écoute puis répète",
@@ -12,6 +13,8 @@ const TYPE_TITLES: Record<ExerciseType, string> = {
   FILL_BLANK: "Complète la phrase",
   WRITE_TRANSLATION: "Traduis par écrit",
   LISTEN_TYPE: "Dictée",
+  WORD_ORDER: "Remets dans l'ordre",
+  CORRECT_MISTAKE: "Corrige la faute",
 };
 
 const TYPE_HINTS: Record<ExerciseType, string> = {
@@ -23,6 +26,8 @@ const TYPE_HINTS: Record<ExerciseType, string> = {
   FILL_BLANK: "Écris le mot manquant en anglais puis valide.",
   WRITE_TRANSLATION: "Écris la traduction anglaise puis valide.",
   LISTEN_TYPE: "Écoute 🔊 autant de fois que nécessaire, puis écris ce que tu entends.",
+  WORD_ORDER: "Touche les mots dans le bon ordre pour reconstruire la phrase.",
+  CORRECT_MISTAKE: "Cette phrase contient une faute : réécris-la correctement.",
 };
 
 const ORAL_TYPES: ExerciseType[] = ["LISTEN_REPEAT", "TRANSLATE_SPEAK", "ROLEPLAY", "READ_ALOUD"];
@@ -233,6 +238,22 @@ export default function LessonPlayer({
                   {phase === "scoring" ? "Évaluation…" : "Valider ma réponse"}
                 </button>
               </>
+            ) : exercise.type === "WORD_ORDER" ? (
+              <div className="keyboard-zone">
+                <WordOrderInput
+                  key={exercise.id}
+                  words={exercise.content.words!}
+                  value={typed}
+                  onChange={setTyped}
+                />
+                <button
+                  className="btn btn-primary btn-block"
+                  disabled={!typed.trim() || phase === "scoring"}
+                  onClick={() => submitAnswer(typed)}
+                >
+                  {phase === "scoring" ? "Évaluation…" : "Valider ma réponse"}
+                </button>
+              </div>
             ) : isOral && !keyboardMode ? (
               <>
                 {phase === "recording" ? (
@@ -274,7 +295,9 @@ export default function LessonPlayer({
                       ? "Écris le mot manquant…"
                       : exercise.type === "LISTEN_TYPE"
                         ? "Écris ce que tu entends…"
-                        : "Écris ta réponse en anglais…"
+                        : exercise.type === "CORRECT_MISTAKE"
+                          ? "Réécris la phrase corrigée…"
+                          : "Écris ta réponse en anglais…"
                   }
                   value={typed}
                   onChange={(e) => setTyped(e.target.value)}

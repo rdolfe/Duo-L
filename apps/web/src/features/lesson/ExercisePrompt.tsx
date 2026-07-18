@@ -77,5 +77,19 @@ export default function ExercisePrompt({ exercise }: { exercise: ExerciseDto }) 
           <p className="muted">La phrase reste secrète — fais confiance à tes oreilles !</p>
         </div>
       );
+    case "WORD_ORDER":
+      return (
+        <div className="prompt-card">
+          {c.textFr && <p className="prompt-main">🇫🇷 « {c.textFr} »</p>}
+          <p className="muted">→ Assemble la phrase anglaise en touchant les mots dans l'ordre.</p>
+        </div>
+      );
+    case "CORRECT_MISTAKE":
+      return (
+        <div className="prompt-card">
+          <p className="prompt-main wrong-sentence">❌ {c.wrong}</p>
+          {c.hintFr && <p className="muted">💭 Indice : {c.hintFr}</p>}
+        </div>
+      );
   }
 }

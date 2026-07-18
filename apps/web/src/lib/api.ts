@@ -80,7 +80,9 @@ export type ExerciseType =
   | "MULTIPLE_CHOICE"
   | "FILL_BLANK"
   | "WRITE_TRANSLATION"
-  | "LISTEN_TYPE";
+  | "LISTEN_TYPE"
+  | "WORD_ORDER"
+  | "CORRECT_MISTAKE";
 
 export type ExerciseDto = {
   id: string;
@@ -98,6 +100,8 @@ export type ExerciseDto = {
     prompt?: string;
     options?: string[];
     sentence?: string;
+    words?: string[];
+    wrong?: string;
   };
 };
 

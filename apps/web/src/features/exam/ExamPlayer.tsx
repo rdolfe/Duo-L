@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, ExamDto, ExamSubmitResult, ExerciseType } from "../../lib/api";
 import { speechRecognitionSupported, startRecognition, RecognitionHandle } from "../../lib/speech";
 import ExercisePrompt from "../lesson/ExercisePrompt";
+import WordOrderInput from "../lesson/WordOrderInput";
 
 const TYPE_LABELS: Record<ExerciseType, string> = {
   LISTEN_REPEAT: "Écoute & répète",
@@ -12,6 +13,8 @@ const TYPE_LABELS: Record<ExerciseType, string> = {
   FILL_BLANK: "Phrase à trou",
   WRITE_TRANSLATION: "Traduction écrite",
   LISTEN_TYPE: "Dictée",
+  WORD_ORDER: "Remets dans l'ordre",
+  CORRECT_MISTAKE: "Corrige la faute",
 };
 
 const ORAL_TYPES: ExerciseType[] = ["LISTEN_REPEAT", "TRANSLATE_SPEAK", "ROLEPLAY", "READ_ALOUD"];
@@ -164,6 +167,15 @@ export default function ExamPlayer({
                   {opt}
                 </button>
               ))}
+            </div>
+          ) : exercise.type === "WORD_ORDER" ? (
+            <div className="keyboard-zone">
+              <WordOrderInput
+                key={exercise.id}
+                words={exercise.content.words!}
+                value={typed}
+                onChange={setTyped}
+              />
             </div>
           ) : isOral && !keyboardMode ? (
             <>
