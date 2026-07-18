@@ -2,6 +2,18 @@ import { FastifyInstance } from "fastify";
 import { CEFR_ORDER, unlockedLevelSet } from "../lib/gamification.js";
 import { userStats } from "./auth.js";
 
+// Mélange (Fisher-Yates) : la bonne réponse d'un QCM ne doit pas toujours
+// occuper la même position. Le scoring compare le TEXTE de la réponse, jamais
+// sa position, donc mélanger à chaque envoi est sans risque.
+function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // Le contenu envoyé au client ne contient jamais les réponses attendues
 // (sauf quand elles font partie de l'énoncé : Listen&Repeat, Roleplay, lecture).
 function clientContent(type: string, raw: string) {
@@ -12,11 +24,11 @@ function clientContent(type: string, raw: string) {
     case "LISTEN_REPEAT":
       return { textEn: c.textEn, hintFr: c.hintFr };
     case "ROLEPLAY":
-      return { contextFr: c.contextFr, npcName: c.npcName, npcLine: c.npcLine, choices: c.choices };
+      return { contextFr: c.contextFr, npcName: c.npcName, npcLine: c.npcLine, choices: shuffled(c.choices) };
     case "READ_ALOUD":
       return { paragraphEn: c.paragraphEn };
     case "MULTIPLE_CHOICE":
-      return { prompt: c.prompt, options: c.options, hintFr: c.hintFr };
+      return { prompt: c.prompt, options: shuffled(c.options), hintFr: c.hintFr };
     case "FILL_BLANK":
       return { sentence: c.sentence, hintFr: c.hintFr };
     case "WRITE_TRANSLATION":
@@ -150,18 +162,27 @@ export async function contentRoutes(app: FastifyInstance) {
   });
 
   app.get("/api/lessons/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const userId = req.user.sub;
     const { id } = req.params as any;
     const lesson = await app.prisma.lesson.findUnique({
       where: { id },
       include: { unit: true, exercises: { orderBy: { sortOrder: "asc" } } },
     });
     if (!lesson) return reply.code(404).send({ error: "Leçon introuvable." });
+
+    // Première fois : ordre pédagogique (groupé par type). Leçon déjà terminée :
+    // ordre aléatoire pour ne pas rejouer exactement la même séquence.
+    const progress = await app.prisma.lessonProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId: id } },
+    });
+    const exercises = progress?.completedAt ? shuffled(lesson.exercises) : lesson.exercises;
+
     return {
       id: lesson.id,
       title: lesson.title,
       xpReward: lesson.xpReward,
       unit: { title: lesson.unit.title, cefrLevel: lesson.unit.cefrLevel },
-      exercises: lesson.exercises.map((e) => ({
+      exercises: exercises.map((e) => ({
         id: e.id,
         type: e.type,
         minScore: e.minScore,
@@ -179,6 +200,9 @@ export async function contentRoutes(app: FastifyInstance) {
       include: { exercises: { orderBy: { sortOrder: "asc" } }, results: { where: { userId } } },
     });
     if (!exam) return reply.code(404).send({ error: "Examen introuvable." });
+    // Déjà tenté ? Ordre aléatoire des questions pour varier les reprises.
+    const retake = (exam.results[0]?.attempts ?? 0) > 0;
+    const examExercises = retake ? shuffled(exam.exercises) : exam.exercises;
     return {
       id: exam.id,
       title: exam.title,
@@ -188,7 +212,7 @@ export async function contentRoutes(app: FastifyInstance) {
       passScore: exam.passScore,
       bestOn20: exam.results[0] ? Math.round(exam.results[0].bestScore / 5) : null,
       passed: exam.results[0]?.passed ?? false,
-      exercises: exam.exercises.map((e) => ({
+      exercises: examExercises.map((e) => ({
         id: e.id,
         type: e.type,
         minScore: e.minScore,

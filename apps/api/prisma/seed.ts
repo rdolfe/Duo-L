@@ -666,6 +666,265 @@ const UNITS: UnitDef[] = [
       },
     ],
   },
+  // ==================== QUIZ QCM (une unité par niveau) ====================
+  {
+    cefrLevel: "A1",
+    title: "Quiz A1",
+    description: "Des QCM du plus facile au plus piégeux pour tester tes bases.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« dog » signifie :", ["chien", "chat", "oiseau", "poisson"], "chien"),
+          MC("« red » est la couleur :", ["rouge", "bleu", "vert", "jaune"], "rouge"),
+          MC("Comment dit-on « au revoir » ?", ["Goodbye", "Good night", "Good luck", "Welcome"], "Goodbye"),
+          MC("« water » signifie :", ["de l'eau", "du vin", "du lait", "du café"], "de l'eau"),
+          MC("Quel jour vient après Monday ?", ["Tuesday", "Sunday", "Thursday", "Friday"], "Tuesday"),
+          MC("« I am hungry » veut dire :", ["J'ai faim", "J'ai soif", "Je suis fatigué", "J'ai froid"], "J'ai faim"),
+          MC("Le pluriel de « cat » est :", ["cats", "cates", "caties", "cat"], "cats"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("« There ___ two apples on the table. »", ["are", "is", "am", "be"], "are", "pluriel"),
+          MC("Quelle heure est « half past nine » ?", ["9 h 30", "9 h 15", "8 h 30", "9 h 45"], "9 h 30"),
+          MC("« She ___ a red car. »", ["has", "have", "is", "haves"], "has"),
+          MC("Le contraire de « big » est :", ["small", "tall", "long", "old"], "small"),
+          MC("« How old are you? » demande :", ["ton âge", "ta taille", "ton nom", "ton adresse"], "ton âge"),
+          MC("« We ___ from Spain. »", ["are", "is", "be", "am"], "are"),
+          MC("Read: « Tom is Anna's brother. » — Anna est…", ["la sœur de Tom", "la mère de Tom", "la fille de Tom", "l'amie de Tom"], "la sœur de Tom", "compréhension"),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("« It's five to eight » signifie :", ["7 h 55", "8 h 05", "5 h 08", "8 h 55"], "7 h 55", "five to = moins cinq"),
+          MC("Quelle phrase est correcte ?", ["There is some milk in the fridge.", "There is any milk in the fridge.", "There are some milk in the fridge.", "It has some milk in the fridge."], "There is some milk in the fridge.", "some en phrase affirmative"),
+          MC("« a loaf of bread » est :", ["un pain entier", "une tranche de pain", "une miette", "un sandwich"], "un pain entier"),
+          MC("Read: « The shop opens at 9 and closes at 5. » — it is open for…", ["eight hours", "nine hours", "five hours", "four hours"], "eight hours", "petit calcul"),
+          MC("Le possessif correct : « This is ___ book. » (le livre de Marie)", ["Marie's", "Maries", "Marie", "of Marie"], "Marie's"),
+          MC("« How much » ou « How many » ? « ___ sugar do you want? »", ["How much", "How many", "How lot", "How some"], "How much", "sugar est indénombrable"),
+          MC("« I don't have ___ money. »", ["any", "some", "a", "many"], "any", "any en phrase négative"),
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "A2",
+    title: "Quiz A2",
+    description: "QCM de grammaire et de vocabulaire du quotidien, en trois paliers.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« cheap » signifie :", ["pas cher", "cher", "gratuit", "cassé"], "pas cher"),
+          MC("Hier = :", ["yesterday", "tomorrow", "today", "tonight"], "yesterday"),
+          MC("« He ___ TV every evening. »", ["watches", "watch", "watching", "watched"], "watches"),
+          MC("Le passé de « go » est :", ["went", "goed", "gone", "going"], "went"),
+          MC("« a return ticket » est :", ["un aller-retour", "un aller simple", "un remboursement", "un reçu"], "un aller-retour"),
+          MC("« I ___ pasta yesterday. »", ["ate", "eat", "eats", "eaten"], "ate"),
+          MC("« luggage » signifie :", ["les bagages", "le passeport", "le billet", "la douane"], "les bagages"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("« ___ they arrive on time? » (passé)", ["Did", "Do", "Does", "Were"], "Did"),
+          MC("« She didn't ___ the email. »", ["send", "sent", "sends", "sending"], "send", "après didn't : base verbale"),
+          MC("Read: « The museum is closed on Mondays. » — on peut y aller…", ["le mardi", "le lundi", "jamais", "seulement le lundi"], "le mardi", "compréhension"),
+          MC("« always » se place :", ["avant le verbe (I always eat…)", "en fin de phrase", "avant le sujet", "n'importe où"], "avant le verbe (I always eat…)"),
+          MC("« I'm going ___ buy some bread. »", ["to", "for", "at", "in"], "to"),
+          MC("Le comparatif de « good » est :", ["better", "gooder", "more good", "best"], "better"),
+          MC("« They ___ at home last night. »", ["were", "was", "are", "be"], "were"),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("Quelle phrase est correcte ?", ["I have never been to Japan.", "I have never gone in Japan.", "I never was to Japan.", "I have never be in Japan."], "I have never been to Japan."),
+          MC("« Whose jacket is this? » demande :", ["à qui appartient la veste", "où est la veste", "combien coûte la veste", "de quelle couleur est la veste"], "à qui appartient la veste"),
+          MC("« She's taller ___ her brother. »", ["than", "that", "as", "of"], "than"),
+          MC("Read: « The 8:15 train is running 20 minutes late. » — il partira à :", ["8:35", "8:15", "8:20", "7:55"], "8:35", "petit calcul"),
+          MC("« You ___ smoke here, it's forbidden. »", ["mustn't", "don't must", "must", "can"], "mustn't"),
+          MC("Le superlatif de « expensive » :", ["the most expensive", "the expensivest", "the more expensive", "most expensive of"], "the most expensive"),
+          MC("« enough » se place : « The coffee is ___ . »", ["hot enough", "enough hot", "hot too", "very enough"], "hot enough", "enough APRÈS l'adjectif"),
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "B1",
+    title: "Quiz B1",
+    description: "Present perfect, nuances et pièges du niveau intermédiaire.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« to improve » signifie :", ["améliorer", "imprimer", "improviser", "empirer"], "améliorer"),
+          MC("« I have lived here ___ 2019. »", ["since", "for", "during", "from"], "since"),
+          MC("« a deadline » est :", ["une date limite", "une ligne morte", "une file d'attente", "une pause"], "une date limite"),
+          MC("« I used to play tennis » signifie :", ["Je jouais au tennis (avant)", "J'ai l'habitude de jouer", "Je joue souvent", "Je viens de jouer"], "Je jouais au tennis (avant)"),
+          MC("« to hire » veut dire :", ["embaucher", "licencier", "démissionner", "postuler"], "embaucher"),
+          MC("« I've just finished » signifie :", ["Je viens de finir", "J'ai fini depuis longtemps", "Je finis bientôt", "Je finis toujours"], "Je viens de finir"),
+          MC("Le contraire de « to succeed » :", ["to fail", "to win", "to try", "to pass"], "to fail"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("« Have you finished ___? »", ["yet", "already", "still", "never"], "yet", "yet en question = déjà"),
+          MC("« While I ___ dinner, the phone rang. »", ["was cooking", "cooked", "am cooking", "cook"], "was cooking", "action en cours interrompue"),
+          MC("Read: « Despite his efforts, he failed. » — il a…", ["échoué malgré ses efforts", "réussi grâce à ses efforts", "abandonné sans effort", "réussi sans effort"], "échoué malgré ses efforts"),
+          MC("« I'd rather stay home » signifie :", ["Je préférerais rester à la maison", "Je devrais rester", "Je dois rester", "Je déteste rester"], "Je préférerais rester à la maison"),
+          MC("« The meeting has been ___ until Friday. »", ["postponed", "posted", "proposed", "pretended"], "postponed", "reporté"),
+          MC("Quelle phrase est correcte ?", ["She has been working here since March.", "She is working here since March.", "She works here since March.", "She worked here since March now."], "She has been working here since March."),
+          MC("« unless » signifie :", ["à moins que", "parce que", "dès que", "tandis que"], "à moins que"),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("« He said he ___ come. » (discours indirect)", ["would", "will", "shall", "can"], "would"),
+          MC("« I wish I ___ more time. »", ["had", "have", "would have", "has"], "had", "souhait irréel → prétérit"),
+          MC("Read: « Hardly anyone came to the meeting. » — la réunion était…", ["presque vide", "bondée", "annulée", "houleuse"], "presque vide", "hardly = à peine"),
+          MC("« to look after » signifie :", ["s'occuper de", "chercher", "regarder derrière", "ressembler à"], "s'occuper de"),
+          MC("« It's worth ___ . »", ["trying", "to try", "try", "tried"], "trying", "worth + -ing"),
+          MC("« a fortnight » est :", ["deux semaines", "une nuit forte", "un mois", "quinze jours de vacances payées"], "deux semaines"),
+          MC("Quelle phrase est correcte ?", ["If I see him, I'll tell him.", "If I will see him, I tell him.", "If I would see him, I'll tell him.", "If I see him, I would told him."], "If I see him, I'll tell him.", "1er conditionnel"),
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "B2",
+    title: "Quiz B2",
+    description: "Conditionnels, phrasal verbs et subtilités : trois paliers corsés.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« to carry out a plan » signifie :", ["exécuter un plan", "porter un plan", "annuler un plan", "dessiner un plan"], "exécuter un plan"),
+          MC("« likely » veut dire :", ["probable", "sympathique", "semblable", "léger"], "probable"),
+          MC("« to run out of milk » :", ["ne plus avoir de lait", "courir chercher du lait", "renverser du lait", "détester le lait"], "ne plus avoir de lait"),
+          MC("« a drawback » est :", ["un inconvénient", "un retour", "un tiroir", "un avantage"], "un inconvénient"),
+          MC("« to cope with » signifie :", ["faire face à", "copier", "couper avec", "collaborer"], "faire face à"),
+          MC("« currently » veut dire :", ["actuellement", "couramment", "rapidement", "récemment"], "actuellement", "faux ami !"),
+          MC("« to set up a company » :", ["créer une entreprise", "vendre une entreprise", "fermer une entreprise", "visiter une entreprise"], "créer une entreprise"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("« If I ___ you, I would apologize. »", ["were", "was being", "am", "would be"], "were"),
+          MC("« The project ___ by an external team. » (passif)", ["was carried out", "carried out", "was carrying out", "has carried"], "was carried out"),
+          MC("Read: « The offer is too good to turn down. » — il faut…", ["accepter l'offre", "refuser l'offre", "négocier l'offre", "ignorer l'offre"], "accepter l'offre", "turn down = refuser"),
+          MC("« by the time we arrived, the film ___ . »", ["had started", "started", "has started", "was starting"], "had started", "past perfect"),
+          MC("« eventually » signifie :", ["finalement", "éventuellement", "rapidement", "peut-être"], "finalement", "faux ami !"),
+          MC("« He denied ___ the money. »", ["stealing", "to steal", "steal", "stole"], "stealing", "deny + -ing"),
+          MC("Quelle phrase est correcte ?", ["I look forward to seeing you.", "I look forward to see you.", "I'm looking forward see you.", "I look forward for seeing you."], "I look forward to seeing you."),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("« No sooner ___ than it started to rain. »", ["had we left", "we had left", "we left", "did we left"], "had we left", "inversion après no sooner"),
+          MC("« actual » signifie :", ["réel", "actuel", "récent", "précis"], "réel", "faux ami : actuel = current"),
+          MC("« to make do with » :", ["se contenter de", "fabriquer avec", "faire avec plaisir", "réussir grâce à"], "se contenter de"),
+          MC("Read: « The proposal fell through at the last minute. » — le projet…", ["a échoué", "a été signé", "a été reporté", "a été amélioré"], "a échoué", "fall through"),
+          MC("« Were it not for your help, … » signifie :", ["Sans ton aide", "Grâce à ton aide", "Avec un peu d'aide", "Malgré ton aide"], "Sans ton aide", "inversion soutenue"),
+          MC("« a foregone conclusion » est :", ["une issue courue d'avance", "une conclusion oubliée", "un malentendu", "une décision annulée"], "une issue courue d'avance"),
+          MC("« He is said ___ very rich. »", ["to be", "being", "that he is", "be"], "to be", "structure passive de rumeur"),
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "C1",
+    title: "Quiz C1",
+    description: "Lexique fin, collocations et sous-entendus : le grand tri.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« reluctant » signifie :", ["réticent", "brillant", "reconnaissant", "détendu"], "réticent"),
+          MC("« to endorse » veut dire :", ["approuver publiquement", "endormir", "endosser un manteau", "renverser"], "approuver publiquement"),
+          MC("« thorough » signifie :", ["minutieux", "à travers", "brutal", "rapide"], "minutieux"),
+          MC("« a setback » est :", ["un revers", "un retour en arrière", "un siège arrière", "un succès"], "un revers"),
+          MC("« compelling » veut dire :", ["captivant / convaincant", "obligatoire", "compliqué", "complet"], "captivant / convaincant"),
+          MC("« to undermine » signifie :", ["saper, fragiliser", "creuser une mine", "souligner", "renforcer"], "saper, fragiliser"),
+          MC("« scarce » veut dire :", ["rare", "effrayant", "abondant", "cher"], "rare"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("« She turned down the offer, ___ surprised everyone. »", ["which", "what", "that", "who"], "which", "relative de commentaire"),
+          MC("Read: « His apology rang hollow. » — ses excuses semblaient…", ["peu sincères", "très émouvantes", "bruyantes", "tardives"], "peu sincères"),
+          MC("« on the verge of » signifie :", ["au bord de", "à l'opposé de", "au sommet de", "à la place de"], "au bord de"),
+          MC("La collocation correcte :", ["to draw a conclusion", "to pull a conclusion", "to drag a conclusion", "to push a conclusion"], "to draw a conclusion"),
+          MC("« albeit » veut dire :", ["quoique", "en outre", "désormais", "notamment"], "quoique"),
+          MC("« He is nothing if not thorough » signifie :", ["Il est extrêmement minutieux", "Il n'est pas minutieux", "Il n'est rien du tout", "Il est parfois minutieux"], "Il est extrêmement minutieux", "tournure emphatique"),
+          MC("« a moot point » est :", ["un point discutable", "un point final", "un détail sans intérêt", "un argument décisif"], "un point discutable"),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("« damning with faint praise » consiste à :", ["critiquer par un éloge tiède", "insulter ouvertement", "féliciter chaleureusement", "se taire poliment"], "critiquer par un éloge tiède"),
+          MC("« Little did he know that… » signifie :", ["Il était loin de se douter que…", "Il savait peu de choses sur…", "Il connaissait à peine…", "Il refusait de savoir…"], "Il était loin de se douter que…"),
+          MC("Read: « The report stopped short of naming names. » — le rapport…", ["n'a pas été jusqu'à citer des noms", "a cité tous les noms", "était trop court", "a été interrompu"], "n'a pas été jusqu'à citer des noms"),
+          MC("« ostensibly » veut dire :", ["en apparence", "avec ostentation", "évidemment", "obstinément"], "en apparence"),
+          MC("La nuance : « childish » vs « childlike » —", ["childish est péjoratif, childlike est positif", "les deux sont identiques", "childlike est péjoratif", "les deux sont péjoratifs"], "childish est péjoratif, childlike est positif"),
+          MC("« to pay lip service to » :", ["soutenir en paroles seulement", "faire un compliment sincère", "embrasser", "payer en liquide"], "soutenir en paroles seulement"),
+          MC("« a Pyrrhic victory » se dit d'une victoire :", ["trop coûteuse pour être fêtée", "écrasante", "obtenue par chance", "volée"], "trop coûteuse pour être fêtée"),
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "C2",
+    title: "Quiz C2",
+    description: "Rhétorique, registres et pièges d'expert : le sommet du QCM.",
+    lessons: [
+      {
+        title: "QCM faciles",
+        exercises: [
+          MC("« to elucidate » signifie :", ["élucider, clarifier", "éluder", "électrifier", "allonger"], "élucider, clarifier"),
+          MC("« brevity » veut dire :", ["la brièveté", "la bravoure", "le brevet", "la brutalité"], "la brièveté"),
+          MC("« quintessential » signifie :", ["typique par excellence", "cinquième", "essentiel mais rare", "précieux"], "typique par excellence"),
+          MC("« to wield power » :", ["exercer le pouvoir", "vouloir le pouvoir", "abandonner le pouvoir", "partager le pouvoir"], "exercer le pouvoir"),
+          MC("« an epiphany » est :", ["une révélation soudaine", "une fête religieuse uniquement", "une épidémie", "un discours final"], "une révélation soudaine"),
+          MC("« terse » veut dire :", ["laconique", "tendre", "terne", "tordu"], "laconique"),
+          MC("« to galvanize a crowd » :", ["électriser une foule", "disperser une foule", "compter une foule", "calmer une foule"], "électriser une foule"),
+        ],
+      },
+      {
+        title: "QCM modérés",
+        exercises: [
+          MC("Un « euphemism » sert à :", ["adoucir une réalité déplaisante", "exagérer un fait", "répéter une idée", "poser une question"], "adoucir une réalité déplaisante"),
+          MC("« Reports of my death are greatly exaggerated » (Twain) est un exemple de :", ["understatement ironique", "hyperbole sincère", "métaphore filée", "anaphore"], "understatement ironique"),
+          MC("« hitherto » signifie :", ["jusqu'ici", "désormais", "par conséquent", "au contraire"], "jusqu'ici"),
+          MC("Read: « His prose verges on the baroque. » — son style est…", ["presque trop orné", "très sobre", "incompréhensible", "inachevé"], "presque trop orné"),
+          MC("« to eschew obfuscation » signifie (avec ironie) :", ["éviter d'être obscur", "rechercher la complexité", "fuir les responsabilités", "mâcher ses mots"], "éviter d'être obscur"),
+          MC("La différence « imply » / « infer » :", ["le locuteur implique, l'auditeur infère", "les deux sont identiques", "l'auditeur implique, le locuteur infère", "imply est plus poli"], "le locuteur implique, l'auditeur infère"),
+          MC("« a tour de force » est :", ["un exploit magistral", "un voyage épuisant", "un coup de force", "une visite guidée"], "un exploit magistral"),
+        ],
+      },
+      {
+        title: "QCM difficiles",
+        exercises: [
+          MC("« I can resist everything except temptation » (Wilde) joue sur :", ["le paradoxe", "la litote", "l'anaphore", "l'allitération"], "le paradoxe"),
+          MC("« mendacious » signifie :", ["mensonger", "mendiant", "menaçant", "méticuleux"], "mensonger"),
+          MC("« to gild the lily » :", ["orner inutilement ce qui est déjà beau", "dorer un bijou", "cultiver des fleurs", "flatter un supérieur"], "orner inutilement ce qui est déjà beau"),
+          MC("Read: « The senator's non-denial denial fooled no one. » — le sénateur a…", ["nié sans vraiment nier", "avoué clairement", "refusé de parler", "menti effrontément"], "nié sans vraiment nier"),
+          MC("« perfidious » est un registre :", ["littéraire et péjoratif", "familier", "technique", "admiratif"], "littéraire et péjoratif"),
+          MC("Le zeugme dans « She left in a taxi and in tears » repose sur :", ["un verbe reliant deux registres différents", "une répétition sonore", "une inversion", "une exagération"], "un verbe reliant deux registres différents"),
+          MC("« sesquipedalian » désigne, avec ironie :", ["l'usage de mots très longs", "un animal à six pattes", "une phrase d'un mot et demi", "un discours d'une heure et demie"], "l'usage de mots très longs"),
+        ],
+      },
+    ],
+  },
 ];
 
 // ---------- Tests de fin de niveau (notés sur 20) ----------

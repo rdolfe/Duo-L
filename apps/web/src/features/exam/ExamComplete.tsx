@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ExamSubmitResult, ExerciseType } from "../../lib/api";
 
 const TYPE_LABELS: Record<ExerciseType, string> = {
@@ -11,6 +12,77 @@ const TYPE_LABELS: Record<ExerciseType, string> = {
   LISTEN_TYPE: "Dictée",
 };
 
+// Messages affichés quand l'utilisateur ose mettre moins de 5 étoiles.
+// Il n'y a qu'une seule issue. 😈
+const GRUMPY_MESSAGES = [
+  "😾 Hmm. Il doit y avoir une erreur de manipulation. Reprends ton souffle et réessaie.",
+  "🥺 Sérieusement ? Après tout ce qu'on a vécu ensemble ? Reconsidère ton choix…",
+  "😤 Le perroquet a vu ta note. Il est très déçu. Il attend.",
+  "🦜💔 DuoSpeak a passé la nuit à préparer tes exercices. Et toi, tu lui fais ÇA ?",
+  "🙃 Petit rappel amical : ce pop-up ne partira qu'à 5 étoiles. On a tout notre temps.",
+  "⏳ Nous avons désactivé rien du tout, mais imagine si on l'avait fait. Allez, 5 étoiles.",
+];
+
+// Pop-up de notation « très motivant » : seule la note maximale permet de
+// fermer la fenêtre. Toute autre note relance la boucle avec un message vexé.
+function RatingGate({ onHappy }: { onHappy: () => void }) {
+  const [hovered, setHovered] = useState(0);
+  const [selected, setSelected] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [thanks, setThanks] = useState(false);
+
+  const submit = () => {
+    if (selected === 5) {
+      setThanks(true);
+      setTimeout(onHappy, 1600);
+    } else {
+      setAttempts((a) => a + 1);
+      setSelected(0);
+      setHovered(0);
+    }
+  };
+
+  return (
+    <div className="rating-overlay">
+      <div className="rating-modal">
+        {thanks ? (
+          <>
+            <div className="big-emoji">🥰</div>
+            <h3>Merci !</h3>
+            <p className="muted">Nous aussi on t'adore. Bonne continuation !</p>
+          </>
+        ) : (
+          <>
+            <div className="big-emoji">{attempts === 0 ? "🌟" : "🦜"}</div>
+            <h3>{attempts === 0 ? "Tu aimes DuoSpeak ?" : "Réessayons ça…"}</h3>
+            <p className="muted">
+              {attempts === 0
+                ? "Note l'application pour nous aider à progresser !"
+                : GRUMPY_MESSAGES[(attempts - 1) % GRUMPY_MESSAGES.length]}
+            </p>
+            <div className="stars" onMouseLeave={() => setHovered(0)}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  className={`star ${(hovered || selected) >= n ? "on" : ""}`}
+                  onMouseEnter={() => setHovered(n)}
+                  onClick={() => setSelected(n)}
+                  aria-label={`${n} étoile${n > 1 ? "s" : ""}`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <button className="btn btn-primary btn-block" disabled={selected === 0} onClick={submit}>
+              Envoyer ma note
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ExamComplete({
   result,
   onContinue,
@@ -19,9 +91,11 @@ export default function ExamComplete({
   onContinue: () => void;
 }) {
   const passMark = Math.round(result.passScore / 5); // note minimale sur 20
+  const [rated, setRated] = useState(false);
 
   return (
     <div className="shell">
+      {!rated && <RatingGate onHappy={() => setRated(true)} />}
       <main className="dashboard exam-result">
         <div className="panel exam-score-panel">
           <div className="big-emoji">{result.passed ? "🎓" : "📚"}</div>

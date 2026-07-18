@@ -491,6 +491,43 @@ p { margin: 0 0 8px; }
   line-height: 1.5;
 }
 
+/* ---------- Pop-up de notation ---------- */
+.rating-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.rating-modal {
+  background: var(--card);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  padding: 28px 26px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+  animation: pop 0.35s ease;
+}
+.rating-modal h3 { font-size: 22px; margin: 6px 0; }
+.rating-modal .muted { min-height: 44px; }
+.stars { display: flex; justify-content: center; gap: 6px; margin: 16px 0 20px; }
+.star {
+  font-size: 38px;
+  line-height: 1;
+  background: none;
+  border: none;
+  color: #d9d9d9;
+  cursor: pointer;
+  transition: transform 0.1s, color 0.1s;
+  padding: 2px;
+}
+.star.on { color: var(--yellow); }
+.star:hover { transform: scale(1.2); }
+
 /* ---------- Déblocage par code ---------- */
 .unlock-row { display: flex; gap: 8px; margin-top: 10px; }
 .unlock-panel input {
