@@ -6,6 +6,7 @@ import LessonPlayer from "./features/lesson/LessonPlayer";
 import LessonComplete from "./features/lesson/LessonComplete";
 import ExamPlayer from "./features/exam/ExamPlayer";
 import ExamComplete from "./features/exam/ExamComplete";
+import CourseReader from "./features/course/CourseReader";
 
 type View =
   | { name: "loading" }
@@ -14,7 +15,8 @@ type View =
   | { name: "lesson"; lessonId: string }
   | { name: "complete"; result: CompleteResult }
   | { name: "exam"; examId: string }
-  | { name: "examResult"; result: ExamSubmitResult };
+  | { name: "examResult"; result: ExamSubmitResult }
+  | { name: "course"; courseId: string };
 
 export default function App() {
   const [view, setView] = useState<View>({ name: "loading" });
@@ -70,6 +72,7 @@ export default function App() {
           onLogout={logout}
           onStartLesson={(lessonId) => setView({ name: "lesson", lessonId })}
           onStartExam={(examId) => setView({ name: "exam", examId })}
+          onOpenCourse={(courseId) => setView({ name: "course", courseId })}
         />
       );
     case "lesson":
@@ -99,5 +102,7 @@ export default function App() {
       );
     case "examResult":
       return <ExamComplete result={view.result} onContinue={() => setView({ name: "dashboard" })} />;
+    case "course":
+      return <CourseReader courseId={view.courseId} onBack={() => setView({ name: "dashboard" })} />;
   }
 }

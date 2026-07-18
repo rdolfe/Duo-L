@@ -92,6 +92,18 @@ model ExamResult {
   @@id([userId, examId])
 }
 
+// Cours théorique d'un niveau (grammaire, vocabulaire, méthodes) : contenu
+// structuré en sections JSON, lisible à tout moment, sans progression à suivre.
+model Course {
+  id        String @id @default(cuid())
+  cefrLevel String
+  title     String
+  sortOrder Int
+  content   String
+
+  @@unique([cefrLevel, sortOrder])
+}
+
 model LessonProgress {
   userId      String
   lessonId    String

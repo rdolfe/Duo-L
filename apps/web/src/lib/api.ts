@@ -41,11 +41,35 @@ export type ExamSummary = {
   bestOn20: number | null;
 };
 
+export type CourseSummary = {
+  id: string;
+  title: string;
+  emoji: string;
+  intro: string;
+};
+
+export type CourseSection = {
+  heading: string;
+  body?: string;
+  examples?: { en: string; fr: string }[];
+  tip?: string;
+};
+
+export type CourseDto = {
+  id: string;
+  cefrLevel: string;
+  title: string;
+  emoji: string;
+  intro: string;
+  sections: CourseSection[];
+};
+
 export type LevelDto = {
   cefrLevel: string;
   unlocked: boolean;
   units: UnitSummary[];
   exam: ExamSummary | null;
+  courses: CourseSummary[];
 };
 
 export type ExerciseType =
@@ -186,6 +210,7 @@ export const api = {
     request<{ answer: string; hearts: number }>("POST", `/api/exercises/${exerciseId}/reveal`, {}),
   completeLesson: (id: string) => request<CompleteResult>("POST", `/api/lessons/${id}/complete`),
   exam: (id: string) => request<ExamDto>("GET", `/api/exams/${id}`),
+  course: (id: string) => request<CourseDto>("GET", `/api/courses/${id}`),
   submitExam: (id: string, answers: { exerciseId: string; transcript: string }[]) =>
     request<ExamSubmitResult>("POST", `/api/exams/${id}/submit`, { answers }),
   dashboard: () => request<DashboardDto>("GET", "/api/dashboard"),

@@ -17,6 +17,21 @@ type LessonDef = { title: string; xp?: number; exercises: Ex[] };
 type UnitDef = { cefrLevel: string; title: string; description: string; lessons: LessonDef[] };
 type ExamDef = { cefrLevel: string; title: string; description: string; passScore?: number; xp?: number; exercises: Ex[] };
 
+// Cours théoriques : explications en français, exemples anglais écoutables.
+type CourseSection = {
+  heading: string;
+  body?: string;
+  examples?: { en: string; fr: string }[];
+  tip?: string;
+};
+type CourseDef = {
+  cefrLevel: string;
+  title: string;
+  emoji: string;
+  intro: string;
+  sections: CourseSection[];
+};
+
 const LR = (textEn: string, hintFr?: string): Ex => ({ type: "LISTEN_REPEAT", textEn, hintFr });
 const TS = (textFr: string, ...accepted: string[]): Ex => ({ type: "TRANSLATE_SPEAK", textFr, accepted });
 const RP = (contextFr: string, npcName: string, npcLine: string, ...choices: string[]): Ex => ({
@@ -778,6 +793,624 @@ const EXAMS: ExamDef[] = [
   },
 ];
 
+// ---------- Cours théoriques (2-3 par niveau, sur les grands thèmes) ----------
+const COURSES: CourseDef[] = [
+  // ==================== A1 ====================
+  {
+    cefrLevel: "A1",
+    title: "Saluer et se présenter",
+    emoji: "👋",
+    intro: "Les toutes premières phrases dont tu as besoin : dire bonjour au bon moment, te présenter et être poli.",
+    sections: [
+      {
+        heading: "Les salutations selon le moment",
+        body: "En anglais, le bonjour change avec l'heure de la journée. « Hello » et « Hi » marchent tout le temps ; les autres sont plus précis.",
+        examples: [
+          { en: "Hello! / Hi!", fr: "Bonjour ! / Salut ! (à toute heure)" },
+          { en: "Good morning.", fr: "Bonjour (le matin, avant midi)" },
+          { en: "Good afternoon.", fr: "Bonjour (l'après-midi)" },
+          { en: "Good evening.", fr: "Bonsoir (en arrivant, le soir)" },
+          { en: "Good night.", fr: "Bonne nuit (seulement pour se quitter ou aller dormir !)" },
+        ],
+        tip: "Piège : « Good night » ne veut pas dire bonsoir ! On l'utilise uniquement pour dire au revoir le soir ou avant de dormir.",
+      },
+      {
+        heading: "Se présenter",
+        body: "Deux façons simples de dire ton prénom, et les questions pour faire connaissance.",
+        examples: [
+          { en: "My name is Paul.", fr: "Je m'appelle Paul." },
+          { en: "I am Paul. / I'm Paul.", fr: "Je suis Paul." },
+          { en: "What's your name?", fr: "Comment t'appelles-tu ?" },
+          { en: "Where are you from? — I am from France.", fr: "D'où viens-tu ? — Je viens de France." },
+          { en: "Nice to meet you.", fr: "Enchanté(e)." },
+        ],
+        tip: "« I'm » est la contraction de « I am ». À l'oral, les anglophones utilisent presque toujours la contraction.",
+      },
+      {
+        heading: "La politesse magique",
+        body: "Quatre mots à connaître par cœur : ils rendent toutes tes phrases polies.",
+        examples: [
+          { en: "Please.", fr: "S'il te/vous plaît." },
+          { en: "Thank you very much!", fr: "Merci beaucoup !" },
+          { en: "You're welcome.", fr: "De rien. (la réponse à thank you)" },
+          { en: "Excuse me… / Sorry!", fr: "Excusez-moi… (pour aborder) / Pardon ! (pour s'excuser)" },
+        ],
+        tip: "« Excuse me » sert à attirer l'attention AVANT (excuse me, where is…?). « Sorry » s'utilise APRÈS une maladresse.",
+      },
+    ],
+  },
+  {
+    cefrLevel: "A1",
+    title: "Être, avoir et les nombres",
+    emoji: "🔢",
+    intro: "Les deux verbes les plus importants de l'anglais, et les nombres pour compter, payer et donner ton âge.",
+    sections: [
+      {
+        heading: "Le verbe « be » (être)",
+        body: "Trois formes seulement au présent : am, are, is. C'est le verbe le plus utilisé de la langue.",
+        examples: [
+          { en: "I am happy.", fr: "Je suis content." },
+          { en: "You are my friend. / We are late. / They are here.", fr: "Tu es mon ami. / Nous sommes en retard. / Ils sont là." },
+          { en: "He is tall. / She is a doctor. / It is cold.", fr: "Il est grand. / Elle est médecin. / Il fait froid." },
+        ],
+      },
+      {
+        heading: "Le verbe « have » (avoir)",
+        body: "« Have » pour tout le monde, sauf he/she/it qui prennent « has ».",
+        examples: [
+          { en: "I have two brothers.", fr: "J'ai deux frères." },
+          { en: "She has a little sister.", fr: "Elle a une petite sœur." },
+        ],
+        tip: "Piège n°1 des francophones : l'âge se dit avec BE, pas have ! « J'ai 20 ans » = « I AM twenty (years old) », jamais « I have 20 years ».",
+      },
+      {
+        heading: "Les nombres",
+        body: "De 13 à 19, les nombres finissent en « -teen ». Les dizaines finissent en « -ty ». Attention à ne pas les confondre à l'oreille !",
+        examples: [
+          { en: "one, two, three, four, five, six, seven, eight, nine, ten", fr: "1 à 10" },
+          { en: "eleven, twelve, thirteen, fourteen, fifteen…", fr: "11, 12, 13, 14, 15…" },
+          { en: "twenty, thirty, forty, fifty… one hundred", fr: "20, 30, 40, 50… 100" },
+          { en: "It costs twenty dollars.", fr: "Ça coûte vingt dollars." },
+        ],
+        tip: "« thirteen » (13) et « thirty » (30) se ressemblent : dans -teen, l'accent est sur la fin ; dans -ty, sur le début. Tends l'oreille !",
+      },
+      {
+        heading: "La famille",
+        examples: [
+          { en: "mother / father — mum / dad", fr: "mère / père — maman / papa" },
+          { en: "brother / sister", fr: "frère / sœur" },
+          { en: "grandmother / grandfather", fr: "grand-mère / grand-père" },
+          { en: "My father's name is John.", fr: "Mon père s'appelle John. (le 's marque la possession)" },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "A1",
+    title: "Se débrouiller partout",
+    emoji: "🧭",
+    intro: "Commander au café, demander ton chemin, prendre le train : les phrases de survie du voyageur débutant.",
+    sections: [
+      {
+        heading: "Commander poliment",
+        body: "« I would like » (je voudrais) est LA formule magique pour commander. Plus poli que « I want » (je veux).",
+        examples: [
+          { en: "I would like a coffee, please.", fr: "Je voudrais un café, s'il vous plaît." },
+          { en: "Can I have some water, please?", fr: "Puis-je avoir de l'eau, s'il vous plaît ?" },
+          { en: "How much is it?", fr: "Combien ça coûte ?" },
+          { en: "The bill, please.", fr: "L'addition, s'il vous plaît." },
+        ],
+      },
+      {
+        heading: "Demander son chemin",
+        body: "« Where is…? » au singulier, « Where are…? » au pluriel. Puis il faut comprendre la réponse !",
+        examples: [
+          { en: "Where is the train station?", fr: "Où est la gare ?" },
+          { en: "Where are the toilets?", fr: "Où sont les toilettes ? (pluriel → are)" },
+          { en: "Go straight ahead.", fr: "Allez tout droit." },
+          { en: "Turn left. / Turn right.", fr: "Tournez à gauche. / Tournez à droite." },
+          { en: "It's next to the supermarket.", fr: "C'est à côté du supermarché." },
+        ],
+      },
+      {
+        heading: "À la gare",
+        examples: [
+          { en: "A ticket to London, please.", fr: "Un billet POUR Londres (direction = to)" },
+          { en: "What time does the train leave?", fr: "À quelle heure part le train ?" },
+          { en: "Which platform is it?", fr: "C'est quel quai ?" },
+          { en: "The train is late / delayed.", fr: "Le train est en retard / retardé." },
+        ],
+        tip: "Si tu ne comprends pas une réponse, ose : « Sorry, can you repeat, please? » (Pardon, pouvez-vous répéter ?). Ça marche partout.",
+      },
+    ],
+  },
+  // ==================== A2 ====================
+  {
+    cefrLevel: "A2",
+    title: "Le présent simple",
+    emoji: "⏰",
+    intro: "Le temps des habitudes et des vérités générales — avec son fameux « -s » à la 3e personne et les questions en do/does.",
+    sections: [
+      {
+        heading: "La règle d'or : le -s",
+        body: "Au présent simple, le verbe ne change JAMAIS… sauf avec he, she, it : on ajoute un -s. C'est l'erreur n°1 mondiale en anglais.",
+        examples: [
+          { en: "I work. You work. We work. They work.", fr: "Le verbe reste identique…" },
+          { en: "He works. She goes. It costs.", fr: "…mais he/she/it prennent un -s (go → goes)." },
+          { en: "She goes to work every day.", fr: "Elle va au travail tous les jours." },
+        ],
+      },
+      {
+        heading: "Questions et négations : do / does",
+        body: "Pour poser une question ou dire non, l'anglais utilise l'auxiliaire do (does pour he/she/it). Et le verbe perd alors son -s !",
+        examples: [
+          { en: "Do you like coffee?", fr: "Aimes-tu le café ?" },
+          { en: "Does she speak English?", fr: "Parle-t-elle anglais ? (does + verbe SANS -s)" },
+          { en: "I don't understand.", fr: "Je ne comprends pas." },
+          { en: "She doesn't live here.", fr: "Elle n'habite pas ici." },
+        ],
+        tip: "Le -s ne peut être qu'à UN seul endroit : « Does she speakS » est impossible. Does a déjà pris le -s !",
+      },
+      {
+        heading: "Les mots de fréquence",
+        examples: [
+          { en: "I always wake up at seven.", fr: "Je me réveille toujours à 7 h." },
+          { en: "She usually goes running on Sundays.", fr: "Elle va généralement courir le dimanche." },
+          { en: "We sometimes watch TV. / They never eat meat.", fr: "Parfois / jamais" },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "A2",
+    title: "Le passé simple (prétérit)",
+    emoji: "🕰️",
+    intro: "Pour raconter ce qui s'est passé hier : les verbes en -ed, les irréguliers incontournables et les questions avec did.",
+    sections: [
+      {
+        heading: "Verbes réguliers : + ed",
+        examples: [
+          { en: "I watched a movie yesterday.", fr: "J'ai regardé un film hier. (watch → watched)" },
+          { en: "They played football on Sunday.", fr: "Ils ont joué au foot dimanche." },
+          { en: "We visited Rome last year.", fr: "Nous avons visité Rome l'année dernière." },
+        ],
+      },
+      {
+        heading: "Les irréguliers à connaître par cœur",
+        body: "Les verbes les plus courants sont presque tous irréguliers. Voici les indispensables :",
+        examples: [
+          { en: "go → went / eat → ate / buy → bought", fr: "aller / manger / acheter" },
+          { en: "see → saw / have → had / lose → lost", fr: "voir / avoir / perdre" },
+          { en: "We went to a restaurant last night.", fr: "Nous sommes allés au restaurant hier soir." },
+          { en: "She bought a new car last week.", fr: "Elle a acheté une nouvelle voiture la semaine dernière." },
+        ],
+      },
+      {
+        heading: "Questions et négations : did",
+        body: "Comme do/does au présent, mais en une seule forme : did. Et le verbe revient à sa forme de base.",
+        examples: [
+          { en: "Did you see the match yesterday?", fr: "As-tu vu le match hier ? (did + see, pas saw !)" },
+          { en: "I didn't go to the party.", fr: "Je ne suis pas allé à la fête." },
+        ],
+        tip: "Les marqueurs de temps du prétérit : yesterday, last night, last week, last year, two days ago… Dès que tu les vois, pense passé !",
+      },
+    ],
+  },
+  {
+    cefrLevel: "A2",
+    title: "Voyager et acheter",
+    emoji: "✈️",
+    intro: "Hôtel, aéroport, boutique, restaurant : le vocabulaire et les tournures pour te débrouiller en voyage.",
+    sections: [
+      {
+        heading: "À l'hôtel",
+        examples: [
+          { en: "I have a reservation for two nights.", fr: "J'ai une réservation pour deux nuits." },
+          { en: "Do you have a room available?", fr: "Avez-vous une chambre de libre ?" },
+          { en: "Is breakfast included?", fr: "Le petit-déjeuner est-il compris ?" },
+          { en: "What time is check-out?", fr: "À quelle heure faut-il libérer la chambre ?" },
+        ],
+      },
+      {
+        heading: "À l'aéroport",
+        examples: [
+          { en: "My flight is delayed / cancelled.", fr: "Mon vol est retardé / annulé." },
+          { en: "Where is the boarding gate?", fr: "Où est la porte d'embarquement ?" },
+          { en: "boarding pass / passport / luggage", fr: "carte d'embarquement / passeport / bagages" },
+        ],
+      },
+      {
+        heading: "Faire les boutiques",
+        examples: [
+          { en: "How much is this jacket?", fr: "Combien coûte cette veste ?" },
+          { en: "Can I try it on?", fr: "Puis-je l'essayer ?" },
+          { en: "Do you have a smaller / bigger size?", fr: "Avez-vous une taille plus petite / plus grande ?" },
+          { en: "Can I pay by card?", fr: "Puis-je payer par carte ?" },
+          { en: "It's too expensive.", fr: "C'est trop cher." },
+        ],
+        tip: "« Can I…? » est parfait partout. « Could I…? » est juste un cran plus poli. Les deux s'utilisent sans risque.",
+      },
+      {
+        heading: "Au restaurant",
+        examples: [
+          { en: "A table for two, please.", fr: "Une table pour deux, s'il vous plaît." },
+          { en: "I'll have the chicken.", fr: "Je vais prendre le poulet. (I'll have = formule de commande)" },
+          { en: "It was delicious!", fr: "C'était délicieux !" },
+          { en: "Could we have the bill, please?", fr: "Pourrions-nous avoir l'addition ?" },
+        ],
+      },
+    ],
+  },
+  // ==================== B1 ====================
+  {
+    cefrLevel: "B1",
+    title: "Le present perfect",
+    emoji: "🌉",
+    intro: "Le pont entre le passé et le présent : « have + participe passé ». LE temps que les francophones confondent avec le passé composé.",
+    sections: [
+      {
+        heading: "Quand l'utiliser ?",
+        body: "Le present perfect relie une action passée au moment présent : expérience de vie, action qui continue encore, ou résultat visible maintenant.",
+        examples: [
+          { en: "I have been to London three times.", fr: "Je suis allé à Londres trois fois. (expérience, on ne dit pas quand)" },
+          { en: "She has lost her keys.", fr: "Elle a perdu ses clés. (résultat : elle ne les a toujours pas)" },
+          { en: "I have lived here for ten years.", fr: "J'habite ici depuis dix ans. (et j'y habite encore !)" },
+        ],
+        tip: "Avec une date ou un moment précis (yesterday, last year, in 2020), c'est le prétérit, jamais le present perfect : « I saw him yesterday ».",
+      },
+      {
+        heading: "for ou since ?",
+        body: "Les deux se traduisent par « depuis », mais ils ne s'utilisent pas pareil : for + durée, since + point de départ.",
+        examples: [
+          { en: "I have known her for ten years.", fr: "for + une durée (dix ans)" },
+          { en: "She has been working here since 2015.", fr: "since + un point de départ (2015)" },
+          { en: "I have been learning English for two years.", fr: "La forme en -ing insiste sur la durée de l'activité." },
+        ],
+      },
+      {
+        heading: "Les petits mots du perfect",
+        examples: [
+          { en: "Have you ever been to Japan?", fr: "ever = déjà (dans une question)" },
+          { en: "I have never eaten sushi.", fr: "never = jamais" },
+          { en: "She has just left.", fr: "just = viens juste de" },
+          { en: "I have already finished. / I haven't finished yet.", fr: "already = déjà / not yet = pas encore" },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "B1",
+    title: "Donner son opinion",
+    emoji: "💬",
+    intro: "Dire ce que tu penses, être d'accord ou pas — poliment — et éviter le piège du « I am agree ».",
+    sections: [
+      {
+        heading: "Introduire son avis",
+        examples: [
+          { en: "In my opinion, the book is better than the film.", fr: "À mon avis, le livre est meilleur que le film." },
+          { en: "I think / I believe you are right.", fr: "Je pense / je crois que tu as raison." },
+          { en: "If you ask me, it's a great idea.", fr: "Si tu veux mon avis, c'est une super idée." },
+        ],
+      },
+      {
+        heading: "Être d'accord… ou pas",
+        body: "« Agree » est un VERBE en anglais, pas un adjectif. On dit « I agree », jamais « I am agree ».",
+        examples: [
+          { en: "I agree with you.", fr: "Je suis d'accord avec toi. (agree = verbe !)" },
+          { en: "I couldn't agree more.", fr: "Je suis tout à fait d'accord. (littéralement : impossible d'être plus d'accord)" },
+          { en: "I disagree. / I don't agree.", fr: "Je ne suis pas d'accord." },
+          { en: "I see your point, but I disagree.", fr: "Je comprends ton point de vue, mais je ne suis pas d'accord." },
+        ],
+        tip: "Piège classique : « je suis d'accord » se traduit par « I agree » (verbe), PAS « I am agree ». C'est l'erreur la plus fréquente au B1 !",
+      },
+      {
+        heading: "Nuancer poliment",
+        examples: [
+          { en: "Really? I found it quite boring.", fr: "Ah bon ? Je l'ai trouvé plutôt ennuyeux. (désaccord doux)" },
+          { en: "I'm not sure that would work, but let's discuss it.", fr: "Je ne suis pas sûr que ça marche, mais discutons-en." },
+          { en: "It depends on how we use it.", fr: "Ça dépend de comment on l'utilise." },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "B1",
+    title: "Le monde du travail",
+    emoji: "💼",
+    intro: "Réussir un entretien d'embauche en anglais : parler de ton expérience, de tes qualités, et les tournures pièges.",
+    sections: [
+      {
+        heading: "Parler de son expérience",
+        examples: [
+          { en: "I have three years of experience in marketing.", fr: "J'ai trois ans d'expérience en marketing. (experience IN)" },
+          { en: "I have worked here for three years.", fr: "Je travaille ici depuis trois ans. (present perfect + for)" },
+          { en: "I am available immediately.", fr: "Je suis disponible immédiatement." },
+        ],
+      },
+      {
+        heading: "Qualités et défauts",
+        body: "« Strength » = point fort, « weakness » = point faible. À un entretien, un bon défaut est un défaut professionnel et honnête.",
+        examples: [
+          { en: "I am organized, motivated and reliable.", fr: "Je suis organisé, motivé et fiable." },
+          { en: "I work well under pressure.", fr: "Je travaille bien sous pression." },
+          { en: "I sometimes focus too much on details.", fr: "Je me concentre parfois trop sur les détails. (un « bon » défaut)" },
+        ],
+      },
+      {
+        heading: "Les tournures à maîtriser",
+        examples: [
+          { en: "I look forward to hearing from you.", fr: "Dans l'attente de votre réponse. (look forward to + -ING !)" },
+          { en: "Could you call me back?", fr: "Pouvez-vous me rappeler ? (call back = rappeler)" },
+          { en: "I am looking for a new challenge.", fr: "Je cherche un nouveau défi." },
+        ],
+        tip: "Après « look forward to », le verbe prend -ing : « I look forward to hearING from you ». Le « to » ici n'est pas celui de l'infinitif !",
+      },
+    ],
+  },
+  // ==================== B2 ====================
+  {
+    cefrLevel: "B2",
+    title: "Les conditionnels",
+    emoji: "🔮",
+    intro: "Imaginer, rêver, regretter : les trois conditionnels anglais et leurs pièges (If I were, would have, Had I known…).",
+    sections: [
+      {
+        heading: "1er conditionnel : le futur possible",
+        body: "Si c'est réaliste : if + présent, puis will. Jamais de will juste après if !",
+        examples: [
+          { en: "If it rains tomorrow, we will stay at home.", fr: "S'il pleut demain, nous resterons à la maison." },
+          { en: "If you are tired, go to bed.", fr: "Si tu es fatigué, va te coucher." },
+        ],
+      },
+      {
+        heading: "2e conditionnel : l'imaginaire",
+        body: "Si c'est hypothétique ou irréel : if + prétérit, puis would. Et on dit « If I WERE » (pas was) dans un registre soigné.",
+        examples: [
+          { en: "If I were rich, I would travel the world.", fr: "Si j'étais riche, je voyagerais partout." },
+          { en: "If I had more time, I would learn the piano.", fr: "Si j'avais plus de temps, j'apprendrais le piano." },
+          { en: "I wish I were taller.", fr: "J'aimerais être plus grand. (même logique : were)" },
+        ],
+      },
+      {
+        heading: "3e conditionnel : le regret",
+        body: "Pour parler de ce qui aurait pu se passer : if + had + participe, puis would have + participe.",
+        examples: [
+          { en: "If she had studied, she would have passed.", fr: "Si elle avait étudié, elle aurait réussi." },
+          { en: "Had I known, I would have come.", fr: "Si j'avais su, je serais venu. (inversion élégante : Had I known = If I had known)" },
+          { en: "I should have listened to you.", fr: "J'aurais dû t'écouter. (should have + participe = regret)" },
+          { en: "You could have warned me.", fr: "Tu aurais pu me prévenir." },
+        ],
+        tip: "L'inversion « Had I known… », « Scarcely had he arrived… » est très prisée à l'écrit soutenu — et adorée des examens !",
+      },
+    ],
+  },
+  {
+    cefrLevel: "B2",
+    title: "Nuancer et connecter ses idées",
+    emoji: "⚖️",
+    intro: "Les connecteurs logiques et les adverbes de nuance qui font passer ton anglais du « correct » au « convaincant ».",
+    sections: [
+      {
+        heading: "Les connecteurs de contraste",
+        examples: [
+          { en: "However, the results were disappointing.", fr: "Cependant… (contraste fort, en début de phrase)" },
+          { en: "Nevertheless, we decided to continue.", fr: "Néanmoins…" },
+          { en: "Despite the rain, the match went ahead.", fr: "Malgré + nom (despite the rain)" },
+          { en: "Although it was late, we kept working.", fr: "Bien que + phrase (although it was late)" },
+          { en: "On the one hand… on the other hand…", fr: "D'un côté… de l'autre…" },
+        ],
+        tip: "Despite + nom, although + sujet-verbe. « Despite it was raining » est faux ; « Despite the rain » ou « Although it was raining » sont justes.",
+      },
+      {
+        heading: "Les connecteurs d'addition et de conséquence",
+        examples: [
+          { en: "Moreover, the price is reasonable.", fr: "De plus… (addition)" },
+          { en: "Therefore, we must act now.", fr: "Par conséquent… (conséquence)" },
+          { en: "Indeed, the results speak for themselves.", fr: "En effet… (confirmation)" },
+        ],
+      },
+      {
+        heading: "Doser ses propos",
+        body: "Les adverbes de degré te permettent d'être précis : légèrement déçu n'est pas anéanti !",
+        examples: [
+          { en: "The results are somewhat disappointing.", fr: "…quelque peu décevants (léger)" },
+          { en: "It's quite interesting. / rather difficult.", fr: "assez intéressant / plutôt difficile (moyen)" },
+          { en: "I highly doubt this plan will work.", fr: "Je doute fort que… (fort)" },
+          { en: "I agree with you up to a point.", fr: "Je suis d'accord jusqu'à un certain point." },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "B2",
+    title: "Phrasal verbs et idiomes essentiels",
+    emoji: "🧩",
+    intro: "Les verbes à particule et expressions que les anglophones utilisent en permanence — et qui changent tout le sens.",
+    sections: [
+      {
+        heading: "Les phrasal verbs incontournables",
+        body: "Un verbe + une particule = un sens souvent imprévisible. Il faut les apprendre comme des mots à part entière.",
+        examples: [
+          { en: "to give up", fr: "abandonner" },
+          { en: "to put off a meeting", fr: "reporter une réunion" },
+          { en: "to call off a meeting", fr: "annuler une réunion" },
+          { en: "The talks broke down.", fr: "Les négociations ont échoué. (break down = échouer / tomber en panne)" },
+          { en: "to call back", fr: "rappeler (au téléphone)" },
+        ],
+      },
+      {
+        heading: "Exprimer le ras-le-bol et le goût",
+        examples: [
+          { en: "I'm fed up with this noise!", fr: "J'en ai marre de ce bruit !" },
+          { en: "I can't stand football.", fr: "Je déteste le football. (piège : rien à voir avec « être debout »)" },
+          { en: "It's not my cup of tea.", fr: "Ce n'est pas à mon goût." },
+        ],
+      },
+      {
+        heading: "Idiomes courants",
+        examples: [
+          { en: "It's raining cats and dogs.", fr: "Il pleut des cordes." },
+          { en: "That interview was a piece of cake.", fr: "Cet entretien était du gâteau (très facile)." },
+          { en: "Sam is broke.", fr: "Sam est fauché (n'a plus d'argent)." },
+          { en: "a blessing in disguise", fr: "un mal pour un bien" },
+        ],
+        tip: "Ne traduis jamais un idiome mot à mot : cherche l'équivalent. « Il pleut des cordes » ne se dit pas « it rains ropes » !",
+      },
+    ],
+  },
+  // ==================== C1 ====================
+  {
+    cefrLevel: "C1",
+    title: "L'ironie et l'understatement",
+    emoji: "🎭",
+    intro: "L'humour britannique repose sur l'euphémisme : comprendre ce qui est VRAIMENT dit derrière la politesse apparente.",
+    sections: [
+      {
+        heading: "L'understatement : dire moins pour dire plus",
+        body: "Les Britanniques minimisent systématiquement. Un compliment peut se cacher dans une phrase négative, et une critique dévastatrice dans un mot neutre.",
+        examples: [
+          { en: "It's not entirely terrible.", fr: "= C'est plutôt bien ! (éloge déguisé)" },
+          { en: "That could have gone better.", fr: "= C'était une catastrophe." },
+          { en: "The hurricane caused a bit of a mess.", fr: "= L'ouragan a tout détruit. (litote)" },
+          { en: "The show was interesting, to say the least.", fr: "« Interesting » est souvent… une critique polie." },
+        ],
+        tip: "Quand un Britannique dit « interesting » avec un léger temps d'arrêt, méfie-toi : c'est rarement un compliment.",
+      },
+      {
+        heading: "Le sarcasme et ses marqueurs",
+        examples: [
+          { en: "Oh, brilliant. Just what we needed.", fr: "Oh, génial. Exactement ce qu'il nous fallait. (ironique)" },
+          { en: "Well, that went swimmingly.", fr: "Eh bien, ça s'est passé à merveille. (après un fiasco)" },
+          { en: "That's rich, coming from you.", fr: "C'est fort, venant de toi. (reproche ironique)" },
+          { en: "Well, Gordon Ramsay must be trembling.", fr: "…après un plat raté : Gordon Ramsay doit trembler." },
+        ],
+      },
+      {
+        heading: "L'autodérision",
+        body: "Se moquer de soi-même est une politesse sociale en anglais britannique : ça met tout le monde à l'aise.",
+        examples: [
+          { en: "Let's just say cooking isn't my strong suit.", fr: "Disons que la cuisine n'est pas mon point fort." },
+          { en: "Honestly, it was a complete disaster, but we survived.", fr: "Honnêtement, c'était un désastre, mais on a survécu." },
+        ],
+      },
+    ],
+  },
+  {
+    cefrLevel: "C1",
+    title: "Vocabulaire de précision",
+    emoji: "🔬",
+    intro: "Les mots rares qui font la différence au C1 : nuances exactes, collocations et registre soutenu.",
+    sections: [
+      {
+        heading: "Adjectifs de précision",
+        examples: [
+          { en: "ubiquitous", fr: "omniprésent" },
+          { en: "meticulous", fr: "minutieux" },
+          { en: "convoluted", fr: "alambiqué, difficile à suivre" },
+          { en: "evasive", fr: "fuyant, évasif" },
+          { en: "undeniable", fr: "indéniable" },
+        ],
+      },
+      {
+        heading: "Verbes soutenus",
+        examples: [
+          { en: "to exacerbate a problem", fr: "aggraver un problème" },
+          { en: "to distort the truth", fr: "déformer la vérité" },
+          { en: "to deepen the confusion", fr: "aggraver la confusion" },
+          { en: "to eschew violence", fr: "éviter délibérément la violence" },
+        ],
+      },
+      {
+        heading: "Les collocations qui sonnent juste",
+        body: "Un mot juste dans la mauvaise combinaison sonne étranger. Ces paires vont ensemble naturellement :",
+        examples: [
+          { en: "The evidence was far from conclusive.", fr: "…loin d'être concluante." },
+          { en: "Her praise was faint at best.", fr: "Ses éloges étaient tièdes, au mieux. (faint praise)" },
+          { en: "a categorical denial", fr: "un démenti catégorique" },
+          { en: "purely circumstantial evidence", fr: "des preuves purement indirectes" },
+        ],
+        tip: "Apprends les mots PAR PAIRES (faint praise, conclusive evidence…) plutôt qu'isolés : c'est le secret d'un anglais naturel.",
+      },
+    ],
+  },
+  // ==================== C2 ====================
+  {
+    cefrLevel: "C2",
+    title: "L'art de la rhétorique",
+    emoji: "🏛️",
+    intro: "Les figures de style des grands discours : anaphore, chiasme, litote… et pourquoi elles fonctionnent.",
+    sections: [
+      {
+        heading: "L'anaphore : répéter pour marteler",
+        body: "Répéter les mêmes mots en début de phrases successives crée un rythme hypnotique. L'arme favorite de Churchill.",
+        examples: [
+          { en: "We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields.", fr: "Churchill, 1940 : « we shall fight » martelé." },
+          { en: "We shall not flag or fail. We shall go on to the end.", fr: "Nous ne faiblirons ni n'échouerons." },
+        ],
+      },
+      {
+        heading: "Le chiasme : le miroir",
+        body: "Inverser la structure de deux propositions crée un effet de miroir mémorable.",
+        examples: [
+          { en: "Ask not what your country can do for you; ask what you can do for your country.", fr: "Kennedy, 1961 : le chiasme le plus célèbre du XXe siècle." },
+        ],
+      },
+      {
+        heading: "Litote, allitération et question rhétorique",
+        examples: [
+          { en: "The hurricane caused a bit of a mess.", fr: "Litote : minimiser pour amplifier." },
+          { en: "She sells seashells by the seashore.", fr: "Allitération : répétition de sons (ici les s/sh)." },
+          { en: "How much longer must we wait for justice?", fr: "Question rhétorique : on n'attend pas de réponse." },
+        ],
+      },
+      {
+        heading: "Ce qui fait un grand discours",
+        examples: [
+          { en: "clarity of purpose, rhythm of delivery, unshakeable conviction", fr: "clarté du propos, rythme, conviction inébranlable" },
+          { en: "Let us choose courage over comfort, and substance over spectacle.", fr: "Le parallélisme (X over Y, X over Y) rend la phrase citable." },
+        ],
+        tip: "Brevity is the soul of wit (« la brièveté est l'âme de l'esprit », Shakespeare) : les phrases courtes frappent plus fort.",
+      },
+    ],
+  },
+  {
+    cefrLevel: "C2",
+    title: "Traduire l'intraduisible",
+    emoji: "🪄",
+    intro: "Proverbes, idiomes et registres : traduire le SENS et non les mots, la compétence ultime du C2.",
+    sections: [
+      {
+        heading: "Chercher l'équivalent, pas la traduction",
+        body: "Chaque langue a ses images. Le traducteur expert remplace l'image française par l'image anglaise équivalente.",
+        examples: [
+          { en: "It's raining cats and dogs.", fr: "Il pleut des cordes. (chats et chiens ↔ cordes !)" },
+          { en: "Practice makes perfect.", fr: "C'est en forgeant qu'on devient forgeron." },
+          { en: "to feel blue", fr: "avoir le cafard" },
+          { en: "a Pyrrhic victory", fr: "une victoire à la Pyrrhus (trop coûteuse)" },
+        ],
+      },
+      {
+        heading: "Le registre : dire la même chose autrement",
+        body: "Un même message peut être familier, neutre ou soutenu. Le C2, c'est choisir le bon niveau selon le contexte.",
+        examples: [
+          { en: "to obfuscate = to make deliberately unclear", fr: "obscurcir volontairement (très soutenu)" },
+          { en: "notwithstanding = despite", fr: "nonobstant = malgré (juridique/formel)" },
+          { en: "The unprecedented circumstances necessitated a novel approach.", fr: "Registre soutenu : chaque mot est choisi." },
+        ],
+      },
+      {
+        heading: "Les maximes qui se méritent",
+        examples: [
+          { en: "Procrastination is the thief of time.", fr: "La procrastination est le voleur du temps." },
+          { en: "Brevity is the soul of wit.", fr: "La brièveté est l'âme de l'esprit." },
+          { en: "Power is nothing without the wisdom to use it.", fr: "Le pouvoir n'est rien sans la sagesse de s'en servir." },
+        ],
+        tip: "Un idiome bien placé vaut dix phrases correctes : c'est lui qui fait dire « on croirait un natif ».",
+      },
+    ],
+  },
+];
+
 const BADGES = [
   { slug: "first_lesson", titleFr: "Premiers mots", descriptionFr: "Terminer sa première leçon", icon: "🎤", criteriaType: "LESSONS", criteriaValue: 1 },
   { slug: "lessons_5", titleFr: "Bavard", descriptionFr: "Terminer 5 leçons", icon: "🗣️", criteriaType: "LESSONS", criteriaValue: 5 },
@@ -807,6 +1440,7 @@ async function main() {
   await prisma.lesson.deleteMany();
   await prisma.exam.deleteMany();
   await prisma.unit.deleteMany();
+  await prisma.course.deleteMany();
 
   let unitOrder: Record<string, number> = {};
   for (const u of UNITS) {
@@ -852,6 +1486,19 @@ async function main() {
     }
   }
 
+  let courseOrder: Record<string, number> = {};
+  for (const c of COURSES) {
+    courseOrder[c.cefrLevel] = (courseOrder[c.cefrLevel] ?? 0) + 1;
+    await prisma.course.create({
+      data: {
+        cefrLevel: c.cefrLevel,
+        title: c.title,
+        sortOrder: courseOrder[c.cefrLevel],
+        content: JSON.stringify({ emoji: c.emoji, intro: c.intro, sections: c.sections }),
+      },
+    });
+  }
+
   for (const b of BADGES) {
     await prisma.badge.create({ data: b });
   }
@@ -862,7 +1509,7 @@ async function main() {
     EXAMS.reduce((n, e) => n + e.exercises.length, 0);
   console.log(
     "Seed terminé :", UNITS.length, "unités,", lessonCount, "leçons,",
-    EXAMS.length, "tests de niveau,", exerciseCount, "exercices."
+    EXAMS.length, "tests de niveau,", COURSES.length, "cours,", exerciseCount, "exercices."
   );
 }
 

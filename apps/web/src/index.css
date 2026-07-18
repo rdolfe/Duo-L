@@ -430,6 +430,67 @@ p { margin: 0 0 8px; }
 .rev-body .muted { margin: 4px 0; }
 .rev-body .correct-answer { margin: 6px 0 0; }
 
+/* ---------- Cours théoriques ---------- */
+.course-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.course-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid #bde6fb;
+  background: #eaf7ff;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  text-align: left;
+  transition: border-color 0.15s, transform 0.06s;
+}
+.course-card:hover { border-color: var(--blue); }
+.course-card:active { transform: translateY(2px); }
+.course-emoji { font-size: 28px; }
+.course-info { display: flex; flex-direction: column; }
+.course-kind { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; }
+.course-title { font-weight: 700; }
+
+.course-shell { max-width: 760px; }
+.course-topbar-title { flex: 1; text-align: center; font-weight: 800; font-size: 18px; }
+.course-body { padding-bottom: 40px; }
+.course-intro {
+  font-size: 17px;
+  color: var(--muted);
+  border-left: 4px solid var(--blue);
+  padding-left: 14px;
+  margin: 18px 0 24px;
+}
+.course-section {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+.course-section h2 { margin-bottom: 10px; font-size: 20px; }
+.course-text { margin-bottom: 12px; line-height: 1.55; }
+.course-examples { list-style: none; margin: 0; padding: 0; }
+.course-example {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.course-example:last-child { border-bottom: none; }
+.course-example > div { display: flex; flex-direction: column; }
+.example-en { font-weight: 700; font-size: 16px; }
+.example-fr { color: var(--muted); font-size: 14px; }
+.course-tip {
+  background: #fffbe8;
+  border: 2px solid #ffe58a;
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 /* ---------- Déblocage par code ---------- */
 .unlock-row { display: flex; gap: 8px; margin-top: 10px; }
 .unlock-panel input {
@@ -465,4 +526,5 @@ p { margin: 0 0 8px; }
   .reward-row { flex-wrap: wrap; gap: 10px; }
   .badges-grid { grid-template-columns: 1fr 1fr 1fr; }
   .lesson-node { flex: 1 1 100%; justify-content: flex-start; }
+  .course-card { flex: 1 1 100%; }
 }

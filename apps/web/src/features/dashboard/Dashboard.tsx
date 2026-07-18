@@ -17,11 +17,13 @@ export default function Dashboard({
   onLogout,
   onStartLesson,
   onStartExam,
+  onOpenCourse,
 }: {
   stats: UserStats;
   onLogout: () => void;
   onStartLesson: (lessonId: string) => void;
   onStartExam: (examId: string) => void;
+  onOpenCourse: (courseId: string) => void;
 }) {
   const [levels, setLevels] = useState<LevelDto[] | null>(null);
   const [dash, setDash] = useState<DashboardDto | null>(null);
@@ -88,6 +90,25 @@ export default function Dashboard({
                   <span className="level-chip big">{level.cefrLevel}</span>
                   {!level.unlocked && <span className="lock-note">🔒 Réussis le test du niveau précédent</span>}
                 </div>
+
+                {level.courses.length > 0 && (
+                  <div className="course-row">
+                    {level.courses.map((c) => (
+                      <button
+                        key={c.id}
+                        className="course-card"
+                        onClick={() => onOpenCourse(c.id)}
+                        title={c.intro}
+                      >
+                        <span className="course-emoji">{c.emoji}</span>
+                        <span className="course-info">
+                          <span className="course-kind">📖 Cours</span>
+                          <span className="course-title">{c.title}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {level.units.map((u) => (
                   <div key={u.id} className="unit-card">

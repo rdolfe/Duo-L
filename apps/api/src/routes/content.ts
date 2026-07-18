@@ -34,7 +34,7 @@ export async function contentRoutes(app: FastifyInstance) {
   // l'examen de fin de niveau (verrouillé / ouvert / terminé).
   app.get("/api/path", { preHandler: [app.authenticate] }, async (req) => {
     const userId = req.user.sub;
-    const [units, exams, unlocked] = await Promise.all([
+    const [units, exams, courses, unlocked] = await Promise.all([
       app.prisma.unit.findMany({
         include: {
           lessons: {
@@ -46,6 +46,7 @@ export async function contentRoutes(app: FastifyInstance) {
       app.prisma.exam.findMany({
         include: { exercises: { select: { id: true } }, results: { where: { userId } } },
       }),
+      app.prisma.course.findMany({ orderBy: { sortOrder: "asc" } }),
       unlockedLevelSet(app.prisma, userId),
     ]);
 
@@ -119,8 +120,33 @@ export async function contentRoutes(app: FastifyInstance) {
         };
       }
 
-      return { cefrLevel: level, unlocked: levelUnlocked, units: outUnits, exam: examOut };
+      // Cours théoriques du niveau : toujours lisibles, même niveau verrouillé
+      // (lire la théorie ne rapporte ni XP ni progression).
+      const outCourses = courses
+        .filter((c) => c.cefrLevel === level)
+        .map((c) => {
+          const parsed = JSON.parse(c.content);
+          return { id: c.id, title: c.title, emoji: parsed.emoji ?? "📖", intro: parsed.intro ?? "" };
+        });
+
+      return { cefrLevel: level, unlocked: levelUnlocked, units: outUnits, exam: examOut, courses: outCourses };
     });
+  });
+
+  // Contenu complet d'un cours théorique.
+  app.get("/api/courses/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
+    const { id } = req.params as any;
+    const course = await app.prisma.course.findUnique({ where: { id } });
+    if (!course) return reply.code(404).send({ error: "Cours introuvable." });
+    const parsed = JSON.parse(course.content);
+    return {
+      id: course.id,
+      cefrLevel: course.cefrLevel,
+      title: course.title,
+      emoji: parsed.emoji ?? "📖",
+      intro: parsed.intro ?? "",
+      sections: parsed.sections ?? [],
+    };
   });
 
   app.get("/api/lessons/:id", { preHandler: [app.authenticate] }, async (req, reply) => {
