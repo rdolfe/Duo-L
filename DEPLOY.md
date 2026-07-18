@@ -25,7 +25,7 @@ Le fichier [render.yaml](render.yaml) décrit tout (service web + base PostgreSQ
 ### Notes Render
 
 - **Plan gratuit** : le service s'endort après 15 min d'inactivité (premier chargement lent ensuite), et la base gratuite expire après 90 jours (passe au plan payant ou migre vers [Neon](https://neon.tech), gratuit sans limite de durée : il suffit de remplacer `DATABASE_URL` dans les réglages du service).
-- **Mise à jour du contenu des leçons** : le seed est ignoré si la base est déjà peuplée. Pour recharger le contenu (⚠️ efface la progression des joueurs), lance dans le Shell Render : `FORCE_SEED=1 npm run db:seed -w apps/api`.
+- **Mise à jour du contenu des leçons** : le seed **synchronise automatiquement** le contenu à chaque déploiement (nouveau contenu créé, existant mis à jour) **sans toucher aux comptes ni à la progression**. Ajouter du contenu = un simple `git push`. `FORCE_SEED=1` ne sert plus qu'à une remise à zéro complète (⚠️ efface la progression des joueurs).
 
 ## Mobile 📱
 

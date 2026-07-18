@@ -370,6 +370,22 @@ const UNITS: UnitDef[] = [
           LT("I strongly believe we should try."),
         ],
       },
+      {
+        title: "Raconter son week-end",
+        exercises: [
+          LR("I had a great time with my friends.", "J'ai passé un super moment avec mes amis."),
+          LR("We ended up watching movies all night.", "On a fini par regarder des films toute la nuit."),
+          TS("Qu'est-ce que tu as fait ce week-end ?", "what did you do this weekend", "what did you do on the weekend"),
+          TS("On est allés se promener malgré la pluie.", "we went for a walk despite the rain", "we went for a walk in spite of the rain"),
+          RP("Lundi matin, à la machine à café.", "Colleague", "So, how was your weekend?",
+            "It was great, I visited my parents.", "Pretty quiet, I just relaxed at home."),
+          MC("« It was a blast! » signifie :", ["C'était génial", "C'était bruyant", "Ça a explosé", "C'était décevant"], "C'était génial"),
+          MC("Which sentence is correct?", ["I didn't do anything special.", "I didn't did anything special.", "I don't did anything special.", "I didn't done anything special."], "I didn't do anything special."),
+          FB("We ___ up late and missed the bus.", "woke", "se réveiller, au passé"),
+          WT("On s'est bien amusés samedi soir.", "we had a lot of fun on saturday night", "we had a lot of fun saturday night", "we had great fun on saturday night"),
+          LT("We spent the whole afternoon in the park."),
+        ],
+      },
     ],
   },
   {
@@ -394,6 +410,22 @@ const UNITS: UnitDef[] = [
           MC("Which sentence is correct?", ["I have worked here for three years.", "I work here since three years.", "I am working here since three years.", "I have worked here since three years."], "I have worked here for three years."),
           FB("I look forward to ___ from you.", "hearing", "gérondif après « look forward to »"),
           LT("I am looking for a new challenge."),
+        ],
+      },
+      {
+        title: "Au téléphone et par e-mail",
+        exercises: [
+          LR("Could you hold the line, please?", "Pouvez-vous patienter, s'il vous plaît ?"),
+          LR("I'm calling about my order.", "J'appelle au sujet de ma commande."),
+          TS("Pourriez-vous m'envoyer les détails par e-mail ?", "could you send me the details by email", "could you email me the details"),
+          TS("Je vous rappelle dès que possible.", "i will call you back as soon as possible", "i'll call you back as soon as possible"),
+          RP("Un client appelle le support.", "Client", "Hello, I have a problem with my invoice.",
+            "I'm sorry to hear that. Can you give me your order number?", "Let me check that for you right away."),
+          MC("« Please find attached… » s'utilise pour :", ["joindre un document à un e-mail", "chercher un objet perdu", "conclure une réunion", "saluer un collègue"], "joindre un document à un e-mail"),
+          MC("Au téléphone, « Who's calling, please? » signifie :", ["C'est de la part de qui ?", "Qui appelez-vous ?", "Pourquoi appelez-vous ?", "Quel est votre numéro ?"], "C'est de la part de qui ?"),
+          FB("I'm writing ___ regard to your application.", "with", "formule d'e-mail"),
+          WT("Merci de votre réponse rapide.", "thank you for your quick reply", "thanks for your quick reply", "thank you for your prompt reply"),
+          LT("I'll forward the email to the whole team."),
         ],
       },
     ],
@@ -440,6 +472,22 @@ const UNITS: UnitDef[] = [
           LT("On the whole, the plan seems reasonable."),
         ],
       },
+      {
+        title: "Convaincre et négocier",
+        exercises: [
+          LR("Let's find some common ground.", "Trouvons un terrain d'entente."),
+          LR("I'm willing to compromise on the price.", "Je suis prêt à faire un compromis sur le prix."),
+          TS("Qu'est-ce que vous proposez concrètement ?", "what exactly do you propose", "what do you propose exactly", "what are you proposing exactly"),
+          TS("Cette solution profite aux deux parties.", "this solution benefits both parties", "this solution benefits both sides"),
+          RP("Négociation serrée avec un fournisseur.", "Supplier", "This is our final offer, I'm afraid.",
+            "Let's meet halfway on this.", "I'll need to discuss it with my team first."),
+          MC("« a win-win situation » est :", ["une situation gagnant-gagnant", "une double victoire sportive", "un pari risqué", "un jeu à somme nulle"], "une situation gagnant-gagnant"),
+          MC("Which sentence is the most persuasive opener?", ["Imagine cutting your costs by thirty percent.", "I want to sell you something.", "You probably won't like this.", "This is a long presentation."], "Imagine cutting your costs by thirty percent.", "réfléchis à l'accroche"),
+          FB("We won't budge ___ this point.", "on", "ne pas céder sur"),
+          WT("Si vous signez aujourd'hui, la livraison est offerte.", "if you sign today delivery is free", "if you sign today we offer free delivery", "if you sign today shipping is free"),
+          LT("Both sides finally reached an agreement."),
+        ],
+      },
     ],
   },
   // ==================== C1 ====================
@@ -467,6 +515,21 @@ const UNITS: UnitDef[] = [
           LT("That could have gone a little better."),
         ],
       },
+      {
+        title: "Diplomatie et registres",
+        exercises: [
+          LR("With respect, I believe there may be another explanation.", "Sauf votre respect, il y a peut-être une autre explication."),
+          LR("Perhaps we could revisit this at a later stage.", "Peut-être pourrions-nous y revenir plus tard."),
+          TS("Il serait peut-être judicieux d'attendre.", "it might be wise to wait", "it may be wise to wait", "perhaps it would be wise to wait"),
+          TS("Je crains que ce ne soit pas envisageable.", "i am afraid that is not feasible", "i'm afraid that is not an option", "i am afraid that is not an option"),
+          MC("Version diplomatique de « Your plan is bad » :", ["Your plan may benefit from a few adjustments.", "Your plan is terrible, sorry.", "I hate your plan.", "Who made this plan?"], "Your plan may benefit from a few adjustments."),
+          MC("« I hear what you're saying » annonce souvent :", ["un désaccord poli", "un accord total", "un compliment", "une question"], "un désaccord poli"),
+          MC("Registre familier (britannique) de « exhausted » :", ["knackered", "enervated", "lethargic", "somnolent"], "knackered"),
+          FB("Would you be so ___ as to forward the document?", "kind", "formule très polie"),
+          WT("Nous vous serions reconnaissants de répondre rapidement.", "we would be grateful for a prompt reply", "we would appreciate a prompt reply", "we would be grateful if you could reply promptly"),
+          LT("I wonder if you might reconsider your position."),
+        ],
+      },
     ],
   },
   // ==================== C2 ====================
@@ -490,6 +553,21 @@ const UNITS: UnitDef[] = [
           MC("Which sentence uses a rhetorical question?", ["How much longer must we wait for justice?", "We have waited a long time.", "Justice takes time.", "We are still waiting."], "How much longer must we wait for justice?"),
           FB("Ask not what your country can do for you; ask what ___ can do for your country.", "you", "célèbre chiasme"),
           LT("We stand today at a crossroads."),
+        ],
+      },
+      {
+        title: "Débattre comme un maître",
+        exercises: [
+          LR("My opponent's argument, however eloquent, rests on a false premise.", "L'argument de mon adversaire, aussi éloquent soit-il, repose sur une prémisse fausse."),
+          LR("Let us not mistake conviction for correctness.", "Ne confondons pas conviction et justesse."),
+          TS("Permettez-moi de reformuler la question.", "allow me to rephrase the question", "let me rephrase the question"),
+          TS("C'est précisément là que le raisonnement s'effondre.", "that is precisely where the reasoning collapses", "this is precisely where the reasoning falls apart", "that is exactly where the reasoning falls apart"),
+          MC("Dénoncer un « straw man », c'est reprocher à l'adversaire :", ["d'avoir déformé votre argument", "d'être fragile", "de brûler les étapes", "de citer trop fidèlement"], "d'avoir déformé votre argument"),
+          MC("Une attaque « ad hominem » vise :", ["la personne plutôt que l'argument", "l'argument principal", "le public", "la conclusion seulement"], "la personne plutôt que l'argument"),
+          MC("Which rebuttal is the most devastatingly polite?", ["I admire the confidence with which my colleague ignores the evidence.", "You're wrong and you know it.", "Whatever, next question.", "I refuse to answer that."], "I admire the confidence with which my colleague ignores the evidence."),
+          FB("Correlation does not imply ___ .", "causation", "le grand classique des débats"),
+          WT("La charge de la preuve incombe à celui qui affirme.", "the burden of proof lies with the one who asserts", "the burden of proof lies with the person making the claim", "the burden of proof rests on the one who asserts"),
+          LT("A sound argument needs no raised voice."),
         ],
       },
     ],
@@ -576,6 +654,20 @@ const UNITS: UnitDef[] = [
           LT("She promised to send the report by Monday."),
         ],
       },
+      {
+        title: "Expressions du quotidien",
+        exercises: [
+          MC("« to hang out » signifie :", ["passer du temps, traîner", "raccrocher", "étendre le linge", "sortir de prison"], "passer du temps, traîner"),
+          MC("« I'm on my way » veut dire :", ["J'arrive", "Je suis perdu", "Je pars en voyage", "Je suis occupé"], "J'arrive"),
+          MC("Read: « Let's split the bill. » — on propose de…", ["partager l'addition", "annuler la commande", "payer pour tout le monde", "partir sans payer"], "partager l'addition"),
+          MC("« It's up to you » signifie :", ["C'est toi qui décides", "C'est au-dessus de toi", "C'est ta faute", "C'est ton tour"], "C'est toi qui décides"),
+          FB("Can you ___ me a hand with these boxes?", "give", "donner un coup de main", "lend"),
+          FB("I'm running ___ of time.", "out", "à court de"),
+          TS("Ça te dit d'aller boire un café ?", "do you fancy a coffee", "do you want to grab a coffee", "how about a coffee"),
+          WT("Tiens-moi au courant.", "keep me posted", "keep me informed", "let me know"),
+          LT("Let me know if you need anything."),
+        ],
+      },
     ],
   },
   // ==================== ÉCRIT & MIXTE — NIVEAU DIFFICILE ====================
@@ -611,6 +703,21 @@ const UNITS: UnitDef[] = [
           LT("The decision was postponed until further notice."),
         ],
       },
+      {
+        title: "Le passif et l'impersonnel",
+        exercises: [
+          LR("The decision was made behind closed doors.", "La décision a été prise à huis clos."),
+          LR("It is said that the building is haunted.", "On dit que le bâtiment est hanté."),
+          TS("Le rapport a été publié hier.", "the report was published yesterday"),
+          TS("On m'a offert un nouveau poste.", "i was offered a new position", "i was offered a new job"),
+          MC("« The window ___ during the night. »", ["was broken", "is breaking", "broke it", "has broke"], "was broken", "passif au passé"),
+          MC("« It is believed that… » se traduit :", ["On pense que…", "Il croit que…", "C'est incroyable que…", "Il faut croire en…"], "On pense que…"),
+          MC("Which sentence is passive?", ["The novel was written in 1984.", "She wrote the novel in 1984.", "The novel is exciting.", "Writers write novels."], "The novel was written in 1984."),
+          FB("English ___ spoken all over the world.", "is", "passif présent"),
+          WT("Le suspect a été arrêté par la police.", "the suspect was arrested by the police"),
+          LT("The results will be announced next week."),
+        ],
+      },
     ],
   },
   {
@@ -631,6 +738,21 @@ const UNITS: UnitDef[] = [
           MC("Read: « His answer was evasive. » — sa réponse était…", ["fuyante", "précise", "brutale", "drôle"], "fuyante"),
           FB("His speech was deliberately ___ to avoid commitment.", "vague", "flou", "ambiguous"),
           LT("The committee reached a unanimous decision."),
+        ],
+      },
+      {
+        title: "Collocations avancées",
+        exercises: [
+          MC("On dit :", ["heavy rain", "strong rain", "big rain", "hard rain"], "heavy rain", "la collocation naturelle"),
+          MC("« to ___ a promise »", ["keep", "hold", "stay", "guard"], "keep"),
+          MC("On dit :", ["to make a decision", "to do a decision", "to take up a decision", "to build a decision"], "to make a decision"),
+          MC("« utterly » se combine le mieux avec :", ["ridiculous", "good", "nice", "fine"], "ridiculous", "utterly + adjectif fort"),
+          MC("« a burning question » est :", ["une question urgente", "une question dangereuse", "une question interdite", "une question stupide"], "une question urgente"),
+          FB("She paid me a lovely ___ about my speech.", "compliment", "collocation : pay a compliment"),
+          FB("The scandal did lasting ___ to his reputation.", "damage", "collocation : do damage"),
+          TS("Cette théorie ne tient pas la route.", "this theory does not hold water", "this theory doesn't hold water", "this theory does not stand up"),
+          WT("Il a une connaissance approfondie du sujet.", "he has an in-depth knowledge of the subject", "he has a thorough knowledge of the subject", "he has in-depth knowledge of the subject"),
+          LT("Her argument carries considerable weight."),
         ],
       },
     ],
@@ -662,6 +784,21 @@ const UNITS: UnitDef[] = [
           MC("Best translation of « avoir le cafard » :", ["to feel blue", "to have a cockroach", "to be a beetle", "to feel insect"], "to feel blue", "expression idiomatique"),
           MC("Which sentence is the most idiomatic?", ["That job interview was a piece of cake.", "That job interview was a slice of bread.", "That job interview was a cup of sugar.", "That job interview was a bowl of soup."], "That job interview was a piece of cake."),
           LT("Eloquence is the art of saying the right thing at the right moment."),
+        ],
+      },
+      {
+        title: "Faux amis et pièges ultimes",
+        exercises: [
+          MC("« eventually » signifie :", ["finalement", "éventuellement", "également", "évidemment"], "finalement", "LE faux ami classique"),
+          MC("« to demand » signifie :", ["exiger", "demander poliment", "se demander", "questionner"], "exiger", "bien plus fort que le français"),
+          MC("« deceptive » veut dire :", ["trompeur", "décevant", "réceptif", "perceptible"], "trompeur", "décevant = disappointing"),
+          MC("« sensible » signifie :", ["raisonnable", "sensible", "émotif", "fragile"], "raisonnable", "sensible (fr) = sensitive"),
+          MC("« to achieve » :", ["accomplir", "acheter", "achever quelqu'un", "abandonner"], "accomplir"),
+          FB("His speech was full of hidden ___ meanings.", "double", "double sens"),
+          TS("Ce mot n'a pas d'équivalent exact en anglais.", "this word has no exact equivalent in english", "this word has no exact english equivalent"),
+          WT("Traduire, c'est trahir un peu.", "to translate is to betray a little", "translation is a small betrayal", "to translate is to betray a bit"),
+          LT("The subtle irony of the original is easily lost."),
+          RA("False friends are the translator's oldest enemies. Eventually is not éventuellement, sensible is not sensible, and a librairie sells books while a library merely lends them."),
         ],
       },
     ],
@@ -794,6 +931,42 @@ const UNITS: UnitDef[] = [
           MC("Quelle phrase est correcte ?", ["If I see him, I'll tell him.", "If I will see him, I tell him.", "If I would see him, I'll tell him.", "If I see him, I would told him."], "If I see him, I'll tell him.", "1er conditionnel"),
         ],
       },
+      {
+        title: "QCM faciles II",
+        exercises: [
+          MC("« a nap » est :", ["une sieste", "une nappe", "un plan", "une serviette"], "une sieste"),
+          MC("« to book a table » :", ["réserver une table", "lire à table", "acheter une table", "nettoyer une table"], "réserver une table"),
+          MC("Le contraire de « early » :", ["late", "soon", "fast", "never"], "late"),
+          MC("« I feel like eating pizza » signifie :", ["J'ai envie de manger une pizza", "Je ressemble à une pizza", "Je me sens comme une pizza", "Je dois manger une pizza"], "J'ai envie de manger une pizza"),
+          MC("« a commute » est :", ["un trajet domicile-travail", "un ordinateur", "une réunion", "une pause déjeuner"], "un trajet domicile-travail"),
+          MC("« to move house » :", ["déménager", "bouger les meubles", "construire une maison", "vendre une maison"], "déménager"),
+          MC("« I can't make it tonight » signifie :", ["Je ne peux pas venir ce soir", "Je ne sais pas cuisiner ce soir", "Je ne comprends pas ce soir", "Je ne veux pas dormir ce soir"], "Je ne peux pas venir ce soir"),
+        ],
+      },
+      {
+        title: "QCM modérés II",
+        exercises: [
+          MC("« She's been to Rome twice. » — elle…", ["y est allée deux fois", "y habite", "y va bientôt", "n'y est jamais allée"], "y est allée deux fois"),
+          MC("« ___ I was cooking, he was watching TV. »", ["While", "During", "Since", "Until"], "While", "pendant que + phrase"),
+          MC("Which is correct?", ["He's used to working at night.", "He's used to work at night.", "He use to working at night.", "He used to working at night."], "He's used to working at night.", "be used to + -ing = être habitué"),
+          MC("« I'd better leave now » exprime :", ["un conseil que je me donne", "une préférence festive", "un regret", "une interdiction"], "un conseil que je me donne"),
+          MC("Read: « The film wasn't as good as I expected. » — le film était…", ["moins bien que prévu", "meilleur que prévu", "exactement comme prévu", "annulé"], "moins bien que prévu"),
+          MC("Pourquoi dit-on « some advice » et jamais « an advice » ?", ["advice est indénombrable", "advice est pluriel", "advice est féminin", "an est interdit devant un a"], "advice est indénombrable"),
+          MC("« to get rid of » signifie :", ["se débarrasser de", "s'énerver contre", "se souvenir de", "prendre soin de"], "se débarrasser de"),
+        ],
+      },
+      {
+        title: "QCM difficiles II",
+        exercises: [
+          MC("« Hardly had I sat down when the phone rang » signifie :", ["À peine assis, le téléphone a sonné", "Je me suis assis difficilement", "Le téléphone a à peine sonné", "Je refusais de m'asseoir"], "À peine assis, le téléphone a sonné"),
+          MC("« a white lie » est :", ["un pieux mensonge", "un mensonge énorme", "une vérité pure", "une page blanche"], "un pieux mensonge"),
+          MC("« You needn't have come » implique :", ["tu es venu, mais ce n'était pas nécessaire", "tu n'es pas venu", "tu dois venir", "tu viendras peut-être"], "tu es venu, mais ce n'était pas nécessaire"),
+          MC("Read: « He turned up out of the blue. » — il est arrivé…", ["à l'improviste", "déguisé en bleu", "en retard", "déprimé"], "à l'improviste"),
+          MC("« the sooner, the better » :", ["le plus tôt sera le mieux", "tôt ou tard", "mieux vaut tard que jamais", "plus c'est long, mieux c'est"], "le plus tôt sera le mieux"),
+          MC("« I'm broke » vs « it's broken » :", ["fauché / cassé", "cassé / fauché", "les deux : fauché", "les deux : cassé"], "fauché / cassé"),
+          MC("« Would you mind opening the window? » — réponse qui ACCEPTE :", ["Not at all.", "Yes, I would.", "I mind.", "Never."], "Not at all.", "mind = est-ce que ça t'ennuie ?"),
+        ],
+      },
     ],
   },
   {
@@ -835,6 +1008,42 @@ const UNITS: UnitDef[] = [
           MC("« Were it not for your help, … » signifie :", ["Sans ton aide", "Grâce à ton aide", "Avec un peu d'aide", "Malgré ton aide"], "Sans ton aide", "inversion soutenue"),
           MC("« a foregone conclusion » est :", ["une issue courue d'avance", "une conclusion oubliée", "un malentendu", "une décision annulée"], "une issue courue d'avance"),
           MC("« He is said ___ very rich. »", ["to be", "being", "that he is", "be"], "to be", "structure passive de rumeur"),
+        ],
+      },
+      {
+        title: "QCM faciles II",
+        exercises: [
+          MC("« to postpone » :", ["reporter", "poster", "supposer", "imposer"], "reporter"),
+          MC("« a deadline extension » est :", ["un délai supplémentaire", "une ligne plus longue", "une date d'embauche", "une prolongation de contrat"], "un délai supplémentaire"),
+          MC("« reliable » signifie :", ["fiable", "relié", "lisible", "aimable"], "fiable"),
+          MC("« to attend a meeting » :", ["assister à une réunion", "attendre une réunion", "organiser une réunion", "annuler une réunion"], "assister à une réunion", "faux ami !"),
+          MC("« a skill » est :", ["une compétence", "un couteau", "une échelle", "un diplôme"], "une compétence"),
+          MC("Le contraire de « to hire » :", ["to fire", "to higher", "to rent", "to retire"], "to fire"),
+          MC("« overtime » signifie :", ["des heures supplémentaires", "le temps qui passe", "une pause", "un chronomètre"], "des heures supplémentaires"),
+        ],
+      },
+      {
+        title: "QCM modérés II",
+        exercises: [
+          MC("« The house ___ built in 1920. »", ["was", "has", "did", "is being"], "was", "passif au passé"),
+          MC("« I'd rather you ___ smoke here. »", ["didn't", "don't", "won't", "not"], "didn't", "would rather + sujet + prétérit"),
+          MC("« in spite of » se construit avec :", ["un nom (in spite of the rain)", "une phrase complète", "un verbe conjugué", "will"], "un nom (in spite of the rain)"),
+          MC("Read: « Sales have picked up since January. » — les ventes…", ["repartent à la hausse", "ont chuté", "stagnent", "ont été suspendues"], "repartent à la hausse"),
+          MC("« to look into a problem » :", ["examiner un problème", "regarder par la fenêtre", "ignorer un problème", "créer un problème"], "examiner un problème"),
+          MC("« unlikely » signifie :", ["improbable", "antipathique", "malchanceux", "différent"], "improbable"),
+          MC("« The sooner you start, ___ you'll finish. »", ["the earlier", "earlier", "the early", "more early"], "the earlier"),
+        ],
+      },
+      {
+        title: "QCM difficiles II",
+        exercises: [
+          MC("« Not only ___ late, but he also forgot the files. »", ["was he", "he was", "he is", "did he was"], "was he", "inversion après not only"),
+          MC("« to take something with a pinch of salt » :", ["ne pas prendre au pied de la lettre", "assaisonner un plat", "critiquer durement", "accepter sans discuter"], "ne pas prendre au pied de la lettre"),
+          MC("« He would have called if he ___ . »", ["had known", "knew", "would know", "has known"], "had known", "3e conditionnel"),
+          MC("Read: « The CEO stepped down amid the scandal. » — le PDG…", ["a démissionné", "a été promu", "a nié", "a porté plainte"], "a démissionné"),
+          MC("« a ballpark figure » est :", ["une estimation approximative", "un chiffre exact", "un score de baseball", "un budget sportif"], "une estimation approximative"),
+          MC("« seldom » signifie :", ["rarement", "souvent", "seulement", "soudainement"], "rarement"),
+          MC("« By this time next year, I ___ my studies. »", ["will have finished", "will finish", "finish", "am finishing"], "will have finished", "futur antérieur"),
         ],
       },
     ],
@@ -880,6 +1089,42 @@ const UNITS: UnitDef[] = [
           MC("« a Pyrrhic victory » se dit d'une victoire :", ["trop coûteuse pour être fêtée", "écrasante", "obtenue par chance", "volée"], "trop coûteuse pour être fêtée"),
         ],
       },
+      {
+        title: "QCM faciles II",
+        exercises: [
+          MC("« to grasp a concept » :", ["saisir un concept", "attraper un objet", "inventer un concept", "rejeter une idée"], "saisir un concept"),
+          MC("« noteworthy » signifie :", ["remarquable", "digne d'un cahier", "célèbre", "récent"], "remarquable"),
+          MC("« to allege » :", ["alléguer, prétendre", "alléger", "élire", "allier"], "alléguer, prétendre"),
+          MC("« a breakthrough » est :", ["une percée décisive", "une pause", "une panne", "une rupture amoureuse"], "une percée décisive"),
+          MC("« deliberately » signifie :", ["délibérément", "avec délicatesse", "librement", "à voix haute"], "délibérément"),
+          MC("« to withstand » :", ["résister à", "se retirer", "se tenir debout", "comprendre"], "résister à"),
+          MC("« a shortcoming » est :", ["un défaut", "une arrivée imminente", "un raccourci", "une pénurie"], "un défaut"),
+        ],
+      },
+      {
+        title: "QCM modérés II",
+        exercises: [
+          MC("« for the sake of argument » signifie :", ["à titre d'hypothèse", "pour gagner le débat", "par esprit de contradiction", "sans raison"], "à titre d'hypothèse"),
+          MC("« She all but confirmed the rumour » signifie :", ["elle l'a pratiquement confirmée", "elle l'a démentie", "elle a tout confirmé sauf ça", "elle a refusé de parler"], "elle l'a pratiquement confirmée"),
+          MC("« a vested interest » est :", ["un intérêt personnel en jeu", "un investissement bancaire", "un gilet de sécurité", "une curiosité passagère"], "un intérêt personnel en jeu"),
+          MC("Read: « His enthusiasm was infectious. » — son enthousiasme…", ["se communiquait aux autres", "était malsain", "rendait malade", "était feint"], "se communiquait aux autres"),
+          MC("« to downplay » :", ["minimiser", "jouer doucement", "descendre", "déprimer"], "minimiser"),
+          MC("« by and large » signifie :", ["dans l'ensemble", "de plus en plus", "au sens large", "côte à côte"], "dans l'ensemble"),
+          MC("« a caveat » est :", ["une mise en garde", "une cave à vin", "un cheval", "un privilège"], "une mise en garde"),
+        ],
+      },
+      {
+        title: "QCM difficiles II",
+        exercises: [
+          MC("« He was economical with the truth » veut dire :", ["il a menti par omission", "il a dit toute la vérité", "il parle peu", "il est avare"], "il a menti par omission"),
+          MC("« to split hairs » :", ["couper les cheveux en quatre", "se coiffer", "trancher un débat", "diviser une équipe"], "couper les cheveux en quatre"),
+          MC("« tantamount to » signifie :", ["équivalent à", "opposé à", "supérieur à", "antérieur à"], "équivalent à"),
+          MC("Read: « The minister gave a masterclass in evasion. » — le ministre…", ["a brillamment esquivé les questions", "a donné un cours magistral", "a démissionné avec éclat", "a répondu franchement"], "a brillamment esquivé les questions"),
+          MC("« to court controversy » :", ["rechercher la polémique", "juger une affaire", "éviter le scandale", "faire la cour"], "rechercher la polémique"),
+          MC("« an unmitigated disaster » est un désastre…", ["total, sans circonstances atténuantes", "évité de justesse", "naturel", "exagéré par les médias"], "total, sans circonstances atténuantes"),
+          MC("« damning evidence » :", ["des preuves accablantes", "des preuves fragiles", "des preuves falsifiées", "des preuves religieuses"], "des preuves accablantes"),
+        ],
+      },
     ],
   },
   {
@@ -921,6 +1166,42 @@ const UNITS: UnitDef[] = [
           MC("« perfidious » est un registre :", ["littéraire et péjoratif", "familier", "technique", "admiratif"], "littéraire et péjoratif"),
           MC("Le zeugme dans « She left in a taxi and in tears » repose sur :", ["un verbe reliant deux registres différents", "une répétition sonore", "une inversion", "une exagération"], "un verbe reliant deux registres différents"),
           MC("« sesquipedalian » désigne, avec ironie :", ["l'usage de mots très longs", "un animal à six pattes", "une phrase d'un mot et demi", "un discours d'une heure et demie"], "l'usage de mots très longs"),
+        ],
+      },
+      {
+        title: "QCM faciles II",
+        exercises: [
+          MC("« to ponder » :", ["méditer, réfléchir", "pondre", "peser un objet", "répondre"], "méditer, réfléchir"),
+          MC("« candid » signifie :", ["franc, sincère", "naïf", "candidat", "sucré"], "franc, sincère", "faux ami : candide = naive"),
+          MC("« a whim » est :", ["un caprice", "un murmure", "une roue", "un gémissement"], "un caprice"),
+          MC("« to loathe » :", ["détester profondément", "se prélasser", "hésiter", "prêter"], "détester profondément"),
+          MC("« scarcely » signifie :", ["à peine", "effrayamment", "précieusement", "sûrement"], "à peine"),
+          MC("« a feat » est :", ["un exploit", "un pied", "une défaite", "une fête"], "un exploit"),
+          MC("« astute » veut dire :", ["perspicace", "têtu", "malhonnête", "muet"], "perspicace"),
+        ],
+      },
+      {
+        title: "QCM modérés II",
+        exercises: [
+          MC("« a double entendre » est :", ["un sous-entendu grivois", "une double négation", "un malentendu", "une répétition"], "un sous-entendu grivois"),
+          MC("« to wax lyrical about » :", ["s'enthousiasmer longuement sur", "cirer avec soin", "écrire des poèmes", "chanter faux"], "s'enthousiasmer longuement sur"),
+          MC("« the elephant in the room » désigne :", ["le problème évident que tout le monde ignore", "un invité encombrant", "un meuble imposant", "une bonne surprise"], "le problème évident que tout le monde ignore"),
+          MC("Read: « His retort was as swift as it was merciless. » — sa réplique était…", ["rapide et impitoyable", "lente mais gentille", "confuse", "préparée à l'avance"], "rapide et impitoyable"),
+          MC("« He doesn't mince words » signifie :", ["il parle sans détour", "il parle la bouche pleine", "il cuisine bien", "il bégaie"], "il parle sans détour"),
+          MC("« a portmanteau word » est :", ["un mot-valise (brunch, smog)", "un mot étranger", "un mot désuet", "un gros mot"], "un mot-valise (brunch, smog)"),
+          MC("« hubris » désigne :", ["l'orgueil démesuré", "l'humilité", "la sagesse antique", "la peur du vide"], "l'orgueil démesuré"),
+        ],
+      },
+      {
+        title: "QCM difficiles II",
+        exercises: [
+          MC("« The lady doth protest too much » (Shakespeare) suggère :", ["qu'un déni excessif trahit le contraire", "qu'il faut protester davantage", "que la dame a raison", "qu'il faut se taire"], "qu'un déni excessif trahit le contraire"),
+          MC("« weasel words » sont :", ["des mots vagues pour éviter de s'engager", "des compliments sournois", "des mots d'argot animalier", "des insultes déguisées"], "des mots vagues pour éviter de s'engager"),
+          MC("« a shibboleth » est :", ["un marqueur linguistique d'appartenance", "un serpent biblique", "un discours confus", "une insulte ancienne"], "un marqueur linguistique d'appartenance"),
+          MC("« Brevity is the soul of wit » est ironique dans Hamlet car :", ["Polonius le dit au milieu d'un discours interminable", "Hamlet déteste l'humour", "la phrase est très longue", "personne ne rit"], "Polonius le dit au milieu d'un discours interminable"),
+          MC("Un « malapropism » est :", ["la confusion comique de mots proches", "un mal de tête", "une insulte élégante", "un accent régional"], "la confusion comique de mots proches"),
+          MC("« apophasis » : « Je ne mentionnerai même pas ses échecs » consiste à :", ["mentionner en prétendant ne pas mentionner", "avouer son ignorance", "présenter des excuses", "répéter inutilement"], "mentionner en prétendant ne pas mentionner"),
+          MC("Read: « The senator's non-denial denial fooled no one. » — le sénateur a…", ["nié sans vraiment nier", "avoué clairement", "refusé de parler", "convaincu tout le monde"], "nié sans vraiment nier"),
         ],
       },
     ],
@@ -1683,42 +1964,62 @@ const BADGES = [
 ];
 
 async function main() {
-  // En production, ne jamais écraser une base déjà peuplée (ça effacerait la
-  // progression des joueurs). Relancer avec FORCE_SEED=1 pour tout recréer.
-  const existing = await prisma.unit.count();
-  if (existing > 0 && !process.env.FORCE_SEED) {
-    console.log("Base déjà peuplée (" + existing + " unités) — seed ignoré. FORCE_SEED=1 pour forcer.");
-    return;
+  // Deux modes :
+  // - Synchronisation (défaut) : upsert de tout le contenu — le nouveau contenu
+  //   est créé, l'existant est mis à jour, et on ne touche JAMAIS aux comptes
+  //   ni à la progression. Ajouter du contenu ne demande plus de FORCE_SEED.
+  // - FORCE_SEED=1 : remise à zéro complète (efface la progression des joueurs).
+  const existingUnits = await prisma.unit.count();
+  if (existingUnits > 0 && process.env.FORCE_SEED) {
+    console.log("FORCE_SEED=1 — recréation complète du contenu (la progression est effacée)…");
+    await prisma.userBadge.deleteMany();
+    await prisma.badge.deleteMany();
+    await prisma.exerciseAttempt.deleteMany();
+    await prisma.examResult.deleteMany();
+    await prisma.lessonProgress.deleteMany();
+    await prisma.exercise.deleteMany();
+    await prisma.lesson.deleteMany();
+    await prisma.exam.deleteMany();
+    await prisma.unit.deleteMany();
+    await prisma.course.deleteMany();
+  } else if (existingUnits > 0) {
+    console.log("Base déjà peuplée — synchronisation du contenu (comptes et progression conservés)…");
   }
-  await prisma.userBadge.deleteMany();
-  await prisma.badge.deleteMany();
-  await prisma.exerciseAttempt.deleteMany();
-  await prisma.examResult.deleteMany();
-  await prisma.lessonProgress.deleteMany();
-  await prisma.exercise.deleteMany();
-  await prisma.lesson.deleteMany();
-  await prisma.exam.deleteMany();
-  await prisma.unit.deleteMany();
-  await prisma.course.deleteMany();
+
+  let created = 0;
+  let updated = 0;
+  const syncExercise = async (parent: { lessonId?: string; examId?: string }, sortOrder: number, ex: Ex) => {
+    const data = { type: ex.type, content: JSON.stringify(ex), minScore: 55 };
+    const existing = await prisma.exercise.findFirst({ where: { ...parent, sortOrder } });
+    if (existing) {
+      await prisma.exercise.update({ where: { id: existing.id }, data });
+      updated++;
+    } else {
+      await prisma.exercise.create({ data: { ...parent, sortOrder, ...data } });
+      created++;
+    }
+  };
 
   let unitOrder: Record<string, number> = {};
   for (const u of UNITS) {
     unitOrder[u.cefrLevel] = (unitOrder[u.cefrLevel] ?? 0) + 1;
-    const unit = await prisma.unit.create({
-      data: { cefrLevel: u.cefrLevel, title: u.title, description: u.description, sortOrder: unitOrder[u.cefrLevel] },
+    const unit = await prisma.unit.upsert({
+      where: { cefrLevel_sortOrder: { cefrLevel: u.cefrLevel, sortOrder: unitOrder[u.cefrLevel] } },
+      create: { cefrLevel: u.cefrLevel, title: u.title, description: u.description, sortOrder: unitOrder[u.cefrLevel] },
+      update: { title: u.title, description: u.description },
     });
     let li = 0;
     for (const l of u.lessons) {
       li++;
-      const lesson = await prisma.lesson.create({
-        data: { unitId: unit.id, title: l.title, sortOrder: li, xpReward: l.xp ?? 15 },
+      const lesson = await prisma.lesson.upsert({
+        where: { unitId_sortOrder: { unitId: unit.id, sortOrder: li } },
+        create: { unitId: unit.id, title: l.title, sortOrder: li, xpReward: l.xp ?? 15 },
+        update: { title: l.title, xpReward: l.xp ?? 15 },
       });
       let ei = 0;
       for (const ex of byType(l.exercises)) {
         ei++;
-        await prisma.exercise.create({
-          data: { lessonId: lesson.id, type: ex.type, sortOrder: ei, content: JSON.stringify(ex), minScore: 55 },
-        });
+        await syncExercise({ lessonId: lesson.id }, ei, ex);
       }
     }
   }
@@ -1726,9 +2027,17 @@ async function main() {
   let examOrder = 0;
   for (const e of EXAMS) {
     examOrder++;
-    const exam = await prisma.exam.create({
-      data: {
+    const exam = await prisma.exam.upsert({
+      where: { cefrLevel: e.cefrLevel },
+      create: {
         cefrLevel: e.cefrLevel,
+        title: e.title,
+        description: e.description,
+        sortOrder: examOrder,
+        xpReward: e.xp ?? 50,
+        passScore: e.passScore ?? 60,
+      },
+      update: {
         title: e.title,
         description: e.description,
         sortOrder: examOrder,
@@ -1739,27 +2048,23 @@ async function main() {
     let ei = 0;
     for (const ex of byType(e.exercises)) {
       ei++;
-      await prisma.exercise.create({
-        data: { examId: exam.id, type: ex.type, sortOrder: ei, content: JSON.stringify(ex), minScore: 55 },
-      });
+      await syncExercise({ examId: exam.id }, ei, ex);
     }
   }
 
   let courseOrder: Record<string, number> = {};
   for (const c of COURSES) {
     courseOrder[c.cefrLevel] = (courseOrder[c.cefrLevel] ?? 0) + 1;
-    await prisma.course.create({
-      data: {
-        cefrLevel: c.cefrLevel,
-        title: c.title,
-        sortOrder: courseOrder[c.cefrLevel],
-        content: JSON.stringify({ emoji: c.emoji, intro: c.intro, sections: c.sections }),
-      },
+    const content = JSON.stringify({ emoji: c.emoji, intro: c.intro, sections: c.sections });
+    await prisma.course.upsert({
+      where: { cefrLevel_sortOrder: { cefrLevel: c.cefrLevel, sortOrder: courseOrder[c.cefrLevel] } },
+      create: { cefrLevel: c.cefrLevel, title: c.title, sortOrder: courseOrder[c.cefrLevel], content },
+      update: { title: c.title, content },
     });
   }
 
   for (const b of BADGES) {
-    await prisma.badge.create({ data: b });
+    await prisma.badge.upsert({ where: { slug: b.slug }, create: b, update: { ...b } });
   }
 
   const lessonCount = UNITS.reduce((n, u) => n + u.lessons.length, 0);
@@ -1768,7 +2073,8 @@ async function main() {
     EXAMS.reduce((n, e) => n + e.exercises.length, 0);
   console.log(
     "Seed terminé :", UNITS.length, "unités,", lessonCount, "leçons,",
-    EXAMS.length, "tests de niveau,", COURSES.length, "cours,", exerciseCount, "exercices."
+    EXAMS.length, "tests de niveau,", COURSES.length, "cours,", exerciseCount, "exercices",
+    `(${created} exercices créés, ${updated} mis à jour).`
   );
 }
 
