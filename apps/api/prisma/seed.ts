@@ -1208,6 +1208,77 @@ const UNITS: UnitDef[] = [
   },
 ];
 
+// ---------- Génération par gabarit : gonfle les pools mécaniques ----------
+// Chaque session de leçon pioche 8 exercices au hasard dans le pool : plus le
+// pool est grand, moins on retombe sur les mêmes questions. Les exercices
+// « mécaniques » (nombres, conjugaisons…) se génèrent très bien par gabarit.
+function lessonOf(unitTitle: string, lessonTitle: string): LessonDef {
+  const unit = UNITS.find((u) => u.title === unitTitle);
+  const lesson = unit?.lessons.find((l) => l.title === lessonTitle);
+  if (!lesson) throw new Error(`Leçon introuvable : ${unitTitle} / ${lessonTitle}`);
+  return lesson;
+}
+
+// Nombres (A1) : pièges -teen / -ty + dictées de nombres.
+const GEN_NUMBERS: [number, string][] = [
+  [11, "eleven"], [13, "thirteen"], [14, "fourteen"], [15, "fifteen"], [16, "sixteen"],
+  [17, "seventeen"], [18, "eighteen"], [19, "nineteen"], [30, "thirty"], [40, "forty"],
+];
+lessonOf("La vie quotidienne", "Les nombres").exercises.push(
+  ...GEN_NUMBERS.map(([n, w]) => {
+    const twin = n >= 13 && n <= 19 ? (n - 10) * 10 : n >= 30 ? n / 10 + 10 : n + 2;
+    return MC(`Which number is « ${w} »?`, [String(n), String(twin), String(n + 1), String(n - 1)], String(n), "attention aux -teen / -ty !");
+  }),
+  LT("It costs seventeen dollars."),
+  LT("There are thirty people in the room."),
+  LT("She is forty years old."),
+);
+
+// Présent simple (A2) : le -s de la 3e personne sous toutes ses formes.
+const GEN_3S: [string, string, string][] = [
+  ["She ___ in a bank.", "works", "work"],
+  ["He ___ football on Saturdays.", "plays", "play"],
+  ["She ___ TV after dinner.", "watches", "watch"],
+  ["He ___ to school by bus.", "goes", "go"],
+  ["She ___ English every morning.", "studies", "study"],
+  ["He ___ math at university.", "teaches", "teach"],
+  ["It ___ ten euros.", "costs", "cost"],
+  ["She ___ very hard at work.", "tries", "try"],
+  ["He ___ his car every Sunday.", "washes", "wash"],
+  ["She ___ breakfast at seven.", "has", "have"],
+];
+lessonOf("Grammaire en action", "Le présent simple").exercises.push(
+  ...GEN_3S.map(([s, good, base]) => MC(s, [good, base, base + "ing", "did " + base], good, "3e personne du singulier")),
+);
+
+// Prétérit (A2) : les irréguliers incontournables.
+const GEN_IRREG: [string, string, string[]][] = [
+  ["go", "went", ["goed", "gone", "going"]],
+  ["eat", "ate", ["eated", "eaten", "eating"]],
+  ["buy", "bought", ["buyed", "brought", "buying"]],
+  ["see", "saw", ["seed", "seen", "sawed"]],
+  ["take", "took", ["taked", "taken", "tooked"]],
+  ["come", "came", ["comed", "coming", "camed"]],
+  ["write", "wrote", ["writed", "written", "writing"]],
+  ["drink", "drank", ["drinked", "drunk", "drinking"]],
+  ["drive", "drove", ["drived", "driven", "driving"]],
+  ["speak", "spoke", ["speaked", "spoken", "speaking"]],
+  ["know", "knew", ["knowed", "known", "knowing"]],
+  ["think", "thought", ["thinked", "taught", "thinking"]],
+];
+lessonOf("Grammaire en action", "Le passé simple").exercises.push(
+  ...GEN_IRREG.map(([base, past, wrong]) => MC(`Le passé de « ${base} » est :`, [past, ...wrong], past)),
+);
+
+// for / since (B2) : le duo « depuis » sous toutes ses coutures.
+const GEN_FOR_SINCE: [string, "for" | "since"][] = [
+  ["2018", "since"], ["three months", "for"], ["last summer", "since"], ["a long time", "for"],
+  ["Monday", "since"], ["two hours", "for"], ["my childhood", "since"], ["ages", "for"],
+];
+lessonOf("Précision et style", "Grammaire avancée").exercises.push(
+  ...GEN_FOR_SINCE.map(([x, ans]) => FB(`She has worked here ___ ${x}.`, ans, "for + durée, since + point de départ")),
+);
+
 // ---------- Tests de fin de niveau (notés sur 20) ----------
 // Un examen par niveau. Le réussir (score ≥ passScore %) débloque le niveau
 // suivant. Les questions mélangent tous les types déjà pratiqués dans le niveau.

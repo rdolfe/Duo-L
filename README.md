@@ -29,7 +29,7 @@ Ouvre http://localhost:5173 dans **Chrome ou Edge** (la reconnaissance vocale We
 - Bouton « 💡 Je ne sais pas — voir la réponse » sur chaque exercice de leçon (coûte 1 cœur ; les tests ne coûtent pas de cœurs).
 - Scoring : alignement mot à mot (Needleman-Wunsch) + distance de Levenshtein, calculé côté serveur ; comparaison exacte pour les QCM. Les nombres sont normalisés : « 1 » et « one », « 21 » et « twenty-one » sont équivalents.
 - Gamification : XP (journal `XpEvent`), séries quotidiennes, 5 vies (régénération : 1 cœur / 7 s), 9 badges.
-- Parcours A1 → C2 : 21 unités, 68 leçons, 6 tests de niveau, ~695 exercices. Chaque leçon mêle oral et **réflexion** (QCM de compréhension en anglais, « quelle phrase est correcte », petits calculs, pièges de traduction). Les exercices sont regroupés par type au sein de chaque leçon ; déblocage séquentiel des leçons, puis des niveaux via les tests.
+- Parcours A1 → C2 : 21 unités, 68 leçons, 6 tests de niveau, ~740 exercices. Chaque session de leçon **pioche 8 exercices au hasard** dans le pool de la leçon : refaire une leçon ne ressemble jamais à la fois précédente. Chaque leçon mêle oral et **réflexion** (QCM de compréhension en anglais, « quelle phrase est correcte », petits calculs, pièges de traduction). Les exercices sont regroupés par type au sein de chaque leçon ; déblocage séquentiel des leçons, puis des niveaux via les tests.
 - Les questions des tests de niveau sont **100 % inédites** : mêmes compétences que les leçons, mais phrases différentes (impossible de réussir par cœur).
 - Interface responsive (mobile inclus) — voir [DEPLOY.md](DEPLOY.md) pour la mise en ligne.
 

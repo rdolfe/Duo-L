@@ -105,12 +105,15 @@ model Course {
 }
 
 model LessonProgress {
-  userId      String
-  lessonId    String
-  user        User      @relation(fields: [userId], references: [id])
-  lesson      Lesson    @relation(fields: [lessonId], references: [id])
-  bestScore   Int?
-  completedAt DateTime?
+  userId         String
+  lessonId       String
+  user           User      @relation(fields: [userId], references: [id])
+  lesson         Lesson    @relation(fields: [lessonId], references: [id])
+  bestScore      Int?
+  completedAt    DateTime?
+  // Tirage servi lors du dernier chargement de la leçon (JSON d'ids
+  // d'exercices) : la validation de fin de leçon ne porte que sur eux.
+  currentServing String?
 
   @@id([userId, lessonId])
 }

@@ -144,8 +144,26 @@ export async function attemptRoutes(app: FastifyInstance) {
     });
     if (!lesson) return reply.code(404).send({ error: "Leçon introuvable." });
 
+    const already = await app.prisma.lessonProgress.findUnique({
+      where: { userId_lessonId: { userId, lessonId: id } },
+    });
+
+    // La leçon sert un tirage aléatoire du pool : on ne valide que les
+    // exercices réellement servis (mémorisés dans currentServing au chargement).
+    let targets = lesson.exercises;
+    if (already?.currentServing) {
+      try {
+        const ids: string[] = JSON.parse(already.currentServing);
+        const byId = new Map(lesson.exercises.map((e) => [e.id, e]));
+        const served = ids.map((x) => byId.get(x)).filter((e) => e !== undefined) as typeof lesson.exercises;
+        if (served.length > 0) targets = served;
+      } catch {
+        /* serving illisible → retombe sur le pool complet */
+      }
+    }
+
     const scores: number[] = [];
-    for (const ex of lesson.exercises) {
+    for (const ex of targets) {
       const best = await app.prisma.exerciseAttempt.findFirst({
         where: { userId, exerciseId: ex.id, passed: true },
         orderBy: { score: "desc" },
@@ -156,15 +174,16 @@ export async function attemptRoutes(app: FastifyInstance) {
     const bestScore = Math.round(scores.reduce((s, x) => s + x, 0) / scores.length);
     const perfect = scores.every((s) => s >= 90);
 
-    const already = await app.prisma.lessonProgress.findUnique({
-      where: { userId_lessonId: { userId, lessonId: id } },
-    });
     const firstCompletion = !already?.completedAt;
 
     await app.prisma.lessonProgress.upsert({
       where: { userId_lessonId: { userId, lessonId: id } },
       create: { userId, lessonId: id, bestScore, completedAt: new Date() },
-      update: { bestScore: Math.max(bestScore, already?.bestScore ?? 0), completedAt: already?.completedAt ?? new Date() },
+      update: {
+        bestScore: Math.max(bestScore, already?.bestScore ?? 0),
+        completedAt: already?.completedAt ?? new Date(),
+        currentServing: null, // tirage consommé
+      },
     });
 
     // XP : plein tarif à la première réussite, réduit ensuite ; bonus sans-faute.

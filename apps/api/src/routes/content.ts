@@ -2,6 +2,9 @@ import { FastifyInstance } from "fastify";
 import { CEFR_ORDER, unlockedLevelSet } from "../lib/gamification.js";
 import { userStats } from "./auth.js";
 
+// Nombre d'exercices servis par session de leçon (tirés au hasard dans le pool).
+const SERVE_SIZE = 8;
+
 // Mélange (Fisher-Yates) : la bonne réponse d'un QCM ne doit pas toujours
 // occuper la même position. Le scoring compare le TEXTE de la réponse, jamais
 // sa position, donc mélanger à chaque envoi est sans risque.
@@ -99,7 +102,8 @@ export async function contentRoutes(app: FastifyInstance) {
             id: l.id,
             title: l.title,
             xpReward: l.xpReward,
-            exerciseCount: l.exercises.length,
+            // On affiche ce qu'une session sert réellement, pas la taille du pool.
+            exerciseCount: Math.min(SERVE_SIZE, l.exercises.length),
             status,
             bestScore: l.progress[0]?.bestScore ?? null,
           };
@@ -170,19 +174,36 @@ export async function contentRoutes(app: FastifyInstance) {
     });
     if (!lesson) return reply.code(404).send({ error: "Leçon introuvable." });
 
-    // Première fois : ordre pédagogique (groupé par type). Leçon déjà terminée :
-    // ordre aléatoire pour ne pas rejouer exactement la même séquence.
     const progress = await app.prisma.lessonProgress.findUnique({
       where: { userId_lessonId: { userId, lessonId: id } },
     });
-    const exercises = progress?.completedAt ? shuffled(lesson.exercises) : lesson.exercises;
+
+    // Chaque session pioche SERVE_SIZE exercices au hasard dans le pool de la
+    // leçon : refaire une leçon ne retombe pas sur les mêmes questions. Le
+    // tirage est mémorisé (currentServing) — la fin de leçon ne validera que
+    // ces exercices-là.
+    let served = lesson.exercises;
+    if (served.length > SERVE_SIZE) {
+      served = shuffled(served).slice(0, SERVE_SIZE);
+      // Première fois : on garde l'ordre pédagogique (types groupés).
+      served.sort((a, b) => a.sortOrder - b.sortOrder);
+    }
+    // Leçon déjà terminée : ordre aléatoire pour varier les reprises.
+    if (progress?.completedAt) served = shuffled(served);
+
+    const servingJson = JSON.stringify(served.map((e) => e.id));
+    await app.prisma.lessonProgress.upsert({
+      where: { userId_lessonId: { userId, lessonId: id } },
+      create: { userId, lessonId: id, currentServing: servingJson },
+      update: { currentServing: servingJson },
+    });
 
     return {
       id: lesson.id,
       title: lesson.title,
       xpReward: lesson.xpReward,
       unit: { title: lesson.unit.title, cefrLevel: lesson.unit.cefrLevel },
-      exercises: exercises.map((e) => ({
+      exercises: served.map((e) => ({
         id: e.id,
         type: e.type,
         minScore: e.minScore,
